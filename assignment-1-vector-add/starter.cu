@@ -10,8 +10,23 @@
     }                                                                     \
   } while (0)
 
+void printme(float *in1, float* in2, float *in3, int len)
+{
+	for (int i = 0; i < len; i++)
+	{
+		wbLog(TRACE, in1[i], " ",in2[i] ," " ,in3[i]);
+	}
+}
+
+
+
 __global__ void vecAdd(float *in1, float *in2, float *out, int len) {
   //@@ Insert code to implement vector addition here
+	//return; 
+        for (int i = (blockIdx.x * blockDim.x) + threadIdx.x; i < len; i+= blockDim.x)
+	{
+		out[i] = in1[i] + in2[i];
+	}
 }
 
 int main(int argc, char **argv) {
@@ -38,32 +53,46 @@ int main(int argc, char **argv) {
 
   wbTime_start(GPU, "Allocating GPU memory.");
   //@@ Allocate GPU memory here
+	cudaMalloc(&deviceInput1,(int)(inputLength * sizeof(float)));
+	cudaMalloc(&deviceInput2,(int) (sizeof(float) *  inputLength));
+	cudaMalloc(&deviceOutput,(int)(sizeof(float) *  inputLength));	
 
+ wbLog(TRACE, "DONE GPU MEM ALLOC");
   wbTime_stop(GPU, "Allocating GPU memory.");
 
   wbTime_start(GPU, "Copying input memory to the GPU.");
   //@@ Copy memory to the GPU here
+	cudaMemcpy(deviceInput1, hostInput1, sizeof(float) * inputLength, cudaMemcpyHostToDevice);
+	cudaMemcpy(deviceInput2, hostInput2, sizeof(float) * inputLength, cudaMemcpyHostToDevice);
 
   wbTime_stop(GPU, "Copying input memory to the GPU.");
 
   //@@ Initialize the grid and block dimensions here
+	int num_threads = 32;
+	int num_blocks = 2;	
 
   wbTime_start(Compute, "Performing CUDA computation");
   //@@ Launch the GPU Kernel here
+	vecAdd<<<num_threads, num_blocks>>>(deviceInput1,deviceInput2, deviceOutput, inputLength);
 
   cudaDeviceSynchronize();
   wbTime_stop(Compute, "Performing CUDA computation");
 
+	wbLog(TRACE,"Done running kernel atleast");
   wbTime_start(Copy, "Copying output memory to the CPU");
   //@@ Copy the GPU memory back to the CPU here
-
+	cudaMemcpy(hostOutput, deviceOutput, sizeof(float) * inputLength, cudaMemcpyDeviceToHost);
   wbTime_stop(Copy, "Copying output memory to the CPU");
 
   wbTime_start(GPU, "Freeing GPU Memory");
   //@@ Free the GPU memory here
-
+	cudaFree(deviceInput1);
+	cudaFree(deviceInput2);
+	cudaFree(deviceOutput);
   wbTime_stop(GPU, "Freeing GPU Memory");
 
+
+	printme(hostInput1, hostInput2, hostOutput, inputLength);
   wbSolution(args, hostOutput, inputLength);
 
   free(hostInput1);

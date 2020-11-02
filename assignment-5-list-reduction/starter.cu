@@ -15,11 +15,79 @@
     }                                                                     \
   } while (0)
 
+__global__
 void total(float *input, float *output, int len) {
   //@@ Load a segment of the input vector into shared memory
   //@@ Traverse the reduction tree
   //@@ Write the computed sum of the block to the output vector at the
   //@@ correct index
+  //output[0] = 3.1415926;
+
+  int idx = threadIdx.x;
+  int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
+  
+  volatile __shared__ float smem[BLOCK_SIZE];
+  
+  if (tidx < len) 
+  {
+    smem[idx] = input[tidx];
+    output[tidx] = input[tidx];
+  }
+
+  __syncthreads();
+
+  int i = blockDim.x / 2;
+  
+  for (i = blockDim.x / 2; i > 32; i = i/2)
+  {
+    if (idx < i) 
+    {
+      smem[idx] = smem[idx] + smem[idx + i];
+     //output[idx] = output[idx] + output[idx + i];
+    }
+    
+    __syncthreads();
+  }
+  
+  __syncthreads();
+  
+  if (idx < 32)
+  {
+    //smem[idx] += smem[idx + 64];
+    smem[idx] += smem[idx + 32];
+    smem[idx] += smem[idx + 16];
+    smem[idx] += smem[idx + 8];
+    smem[idx] += smem[idx + 4];
+    smem[idx] += smem[idx + 2];
+    smem[idx] += smem[idx + 1];
+  }
+  /*
+  else if (0)
+  {
+   //output[idx] += output[idx + 128];
+  //output[idx] += output[idx + 64];
+   __syncthreads();
+ output[idx] += output[idx + 32];
+  __syncthreads();
+  output[idx] += output[idx + 16];
+  __syncthreads();
+  output[idx] += output[idx + 8];
+  __syncthreads();
+  output[idx] += output[idx + 4];
+  __syncthreads();
+  output[idx] += output[idx + 2];
+  __syncthreads();
+  output[idx] += output[idx + 1];
+  __syncthreads(); 
+  }
+ */
+  __syncthreads();
+
+  if (idx % BLOCK_SIZE == 0)
+  {
+   output[blockIdx.x] = smem[idx];
+  }
+
 }
 
 int main(int argc, char **argv) {
@@ -38,11 +106,12 @@ int main(int argc, char **argv) {
   hostInput =
       (float *)wbImport(wbArg_getInputFile(args, 0), &numInputElements);
 
-  numOutputElements = numInputElements / (BLOCK_SIZE << 1);
+  numOutputElements = numInputElements / (BLOCK_SIZE);
   if (numInputElements % (BLOCK_SIZE << 1)) {
     numOutputElements++;
   }
   hostOutput = (float *)malloc(numOutputElements * sizeof(float));
+  //hostOutput = (float *)malloc(numInputElements * sizeof(float));
 
   wbTime_stop(Generic, "Importing data and creating memory on host");
 
@@ -53,23 +122,34 @@ int main(int argc, char **argv) {
 
   wbTime_start(GPU, "Allocating GPU memory.");
   //@@ Allocate GPU memory here
+  cudaMalloc(&deviceInput, numInputElements * sizeof(float));
+  cudaMalloc(&deviceOutput, numOutputElements * sizeof(float));
+  //cudaMalloc(&deviceOutput, numInputElements * sizeof(float));
 
   wbTime_stop(GPU, "Allocating GPU memory.");
 
   wbTime_start(GPU, "Copying input memory to the GPU.");
   //@@ Copy memory to the GPU here
+  cudaMemcpy(deviceInput, hostInput, numInputElements * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(deviceOutput, hostOutput, numInputElements * sizeof(float), cudaMemcpyHostToDevice);
 
   wbTime_stop(GPU, "Copying input memory to the GPU.");
   //@@ Initialize the grid and block dimensions here
+  dim3 grid(numOutputElements,1,1);
+  dim3 block(512, 1, 1);
 
   wbTime_start(Compute, "Performing CUDA computation");
   //@@ Launch the GPU Kernel here
+  total<<<grid,block>>>(deviceInput, deviceOutput, numInputElements);
 
   cudaDeviceSynchronize();
+
   wbTime_stop(Compute, "Performing CUDA computation");
 
   wbTime_start(Copy, "Copying output memory to the CPU");
   //@@ Copy the GPU memory back to the CPU here
+  cudaMemcpy(hostOutput, deviceOutput, numOutputElements * sizeof(float), cudaMemcpyDeviceToHost);
+  //cudaMemcpy(hostOutput, deviceOutput, numInputElements * sizeof(float), cudaMemcpyDeviceToHost);
 
   wbTime_stop(Copy, "Copying output memory to the CPU");
 
@@ -82,9 +162,18 @@ int main(int argc, char **argv) {
   for (ii = 1; ii < numOutputElements; ii++) {
     hostOutput[0] += hostOutput[ii];
   }
+  int sum = 0;
+  for (int i = 0; i < 100; i++) {
+    sum += hostOutput[i];  
+    wbLog(TRACE, i, " in -> ", hostInput[i], " out-> ", hostOutput[i]);
+    if (sum >= 3000) {break;}
+  }
+  wbLog(TRACE, "this is output ", hostOutput[0], " num of el ",numOutputElements, " ", sum);
 
   wbTime_start(GPU, "Freeing GPU Memory");
   //@@ Free the GPU memory here
+  cudaFree(deviceInput);
+  cudaFree(deviceOutput);
 
   wbTime_stop(GPU, "Freeing GPU Memory");
 
