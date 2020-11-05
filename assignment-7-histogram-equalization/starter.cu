@@ -7,7 +7,7 @@
 
 //@@ insert code here
 __device__
-unsigned char * cast( float * outputchar, 
+unsigned char * cast(unsigned char * outputchar, 
 	float * inputfloat, 
 	int imageWidth, 
 	int imageHeight, 
@@ -19,11 +19,12 @@ unsigned char * cast( float * outputchar,
 		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
 	}
 
+	return outputchar;
 }
 
 __device__
-unsigned char * decast( float * outputchar, 
-	char * inputfloat, 
+float * decast( float * outputchar, 
+	unsigned char * inputfloat, 
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -31,7 +32,7 @@ unsigned char * decast( float * outputchar,
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
+		outputchar[i] = (float)(inputfloat[i] / 255.0);
 	}
 
 }
