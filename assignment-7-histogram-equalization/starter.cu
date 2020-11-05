@@ -6,7 +6,7 @@
 //TESTING UPDATES BITCH
 
 //@@ insert code here
-__global__
+__device__
 unsigned char * cast( float * outputchar, 
 	float * inputfloat, 
 	int imageWidth, 
@@ -14,17 +14,32 @@ unsigned char * cast( float * outputchar,
 	int imageChannels)
 {
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-	for (int i = tidx; i < imageWidth * imageHeight * imageChannels, i+= blockDim.x)
+	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
 	}
 
-	return outputchar;
+}
+
+__device__
+unsigned char * decast( float * outputchar, 
+	char * inputfloat, 
+	int imageWidth, 
+	int imageHeight, 
+	int imageChannels)
+{
+	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
+	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
+	{
+		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
+	}
+
 }
 
 __global__ 
-void grayify( float * outputgray, 
+void grayify(float * outputgray, 
 	float * inputrgb, 
+	char * temp,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -38,9 +53,9 @@ void grayify( float * outputgray,
 
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
-		r = outputgray[imageChannels * i];
-		g = outputgray[(imageChannels * i) + 1];
-		b = outputgray[(imageChannels * i) + 1];
+		float r = outputgray[imageChannels * i];
+		float g = outputgray[(imageChannels * i) + 1];
+		float b = outputgray[(imageChannels * i) + 1];
 		synchronize();
 		outputgray[tidx] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
@@ -84,9 +99,11 @@ int main(int argc, char **argv) {
 
   //alloc mem and dimensions
   float * cudaInputImageData, cudaOutputImageData;
-  cudaMalloc(&cudaInputImageData, sizeof(FLOAT) * imageChannels * imageHeight * imageWidth);
+  cudaMalloc(&cudaInputImageData, sizeof(float) * imageChannels * imageHeight * imageWidth);
+  cudaMalloc(&cudaOutputImageData, sizeof(float) * imageChannels * imageHeight * imageWidth);
+  cudaMalloc(&cudaTempImageData, sizeof(unsigned char) * imageChannels * imageHeight * imageWidth);
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
-  	sizeof(FLOAT) * imageChannels * imageHeight * imageWidth, cudaMemcpyHostToDevice);
+  	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyHostToDevice);
 
   //send data to kernel
   grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
@@ -97,8 +114,8 @@ int main(int argc, char **argv) {
 
 
   //Retrieve output image data
-  cudaMemcpy(hostOutputImageData, cudaOutputImageData, 
-  	sizeof(FLOAT) * imageChannels * imageHeight * imageWidth, cudaMemcpyDeviceToHost);
+  cudaMemcpy(hostOutputImageData, cudaOutputImageData, cudaTempImageData, 
+  	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyDeviceToHost);
 
 
   wbSolution(args, outputImage);
