@@ -23,8 +23,8 @@ unsigned char * cast(unsigned char * outputchar,
 }
 
 __device__
-float * decast( float * outputchar, 
-	unsigned char * inputfloat, 
+float * decast( float * outputfloat, 
+	unsigned char * inputchar, 
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -32,21 +32,23 @@ float * decast( float * outputchar,
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputchar[i] = (float)(inputfloat[i] / 255.0);
+		outputfloat[i] = (float)(inputchar[i] / 255.0);
 	}
+
+	return outputfloat;
 
 }
 
 __global__ 
 void grayify(float * outputgray, 
 	float * inputrgb, 
-	char * temp,
+	unsigned char * inputchar,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
 {
 
-	outputgray = cast(outputgray, inputrgb, imageWidth, imageHeight, imageChannels);
+	inputchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
 	synchronize();
 
@@ -54,12 +56,16 @@ void grayify(float * outputgray,
 
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
-		float r = outputgray[imageChannels * i];
-		float g = outputgray[(imageChannels * i) + 1];
-		float b = outputgray[(imageChannels * i) + 1];
+		float r = inputchar[imageChannels * i];
+		float g = inputchar[(imageChannels * i) + 1];
+		float b = inputchar[(imageChannels * i) + 1];
 		synchronize();
-		outputgray[tidx] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		inputchar[tidx] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
+
+
+	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
+
 
 }
 
@@ -100,6 +106,7 @@ int main(int argc, char **argv) {
 
   //alloc mem and dimensions
   float * cudaInputImageData, cudaOutputImageData;
+  unsigned char * cudaTempImageData;
   cudaMalloc(&cudaInputImageData, sizeof(float) * imageChannels * imageHeight * imageWidth);
   cudaMalloc(&cudaOutputImageData, sizeof(float) * imageChannels * imageHeight * imageWidth);
   cudaMalloc(&cudaTempImageData, sizeof(unsigned char) * imageChannels * imageHeight * imageWidth);
