@@ -106,16 +106,16 @@ int main(int argc, char **argv)
   hostOutputImageData = wbImage_getData(outputImage);
 
   //alloc mem and dimensions
-  float * cudaInputImageData, cudaOutputImageData;
-  unsigned char * cudaTempImageData;
-  cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth);
-  cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
+  float* cudaInputImageData, cudaOutputImageData;
+  unsigned char* cudaTempImageData;
+  cudaMalloc((void **)&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc((void **)&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyHostToDevice);
 
   //send data to kernel
-  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
+  grayify<<<256,256>>>(&cudaOutputImageData, cudaInputImageData, 
   	cudaTempImageData, imageWidth, imageHeight, imageChannels);
 
 
@@ -123,8 +123,8 @@ int main(int argc, char **argv)
 
 
   //Retrieve output image data
-  cudaMemcpy(hostOutputImageData, cudaOutputImageData, cudaTempImageData, 
-  	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyDeviceToHost);
+  cudaMemcpy(&hostOutputImageData, &cudaOutputImageData, 
+  	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
 
 
   wbSolution(args, outputImage);
