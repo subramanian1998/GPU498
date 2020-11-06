@@ -40,8 +40,8 @@ float * decast( float * outputfloat,
 }
 
 __global__ 
-void grayify(float * outputgray, 
-	float * inputrgb, 
+void grayify(float* outputgray, 
+	float* inputrgb, 
 	unsigned char * inputchar,
 	int imageWidth, 
 	int imageHeight, 
@@ -58,7 +58,7 @@ void grayify(float * outputgray,
 	{
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
-		float b = inputchar[(imageChannels * i) + 1];
+		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
 		inputchar[tidx] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
@@ -68,6 +68,20 @@ void grayify(float * outputgray,
 
 
 }
+
+/*
+__device__ 
+unsigned char** hist(unsigned char* inputchar, int imageWidth, int imageHeight)
+{
+  unsigned char** hgram = (unsigned char**)
+    (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
+
+  for(int i = )
+
+}
+*/
+
+
 
 
 int main(int argc, char **argv) 
