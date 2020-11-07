@@ -21,7 +21,7 @@ unsigned char* cast(unsigned char* outputchar,
 	}
   */
 
-  outputchar[tidx] = (unsigned char)(255 * inputfloat[i]);
+  outputchar[tidx] = (unsigned char)(255 * inputfloat[tidx]);
 
 	return outputchar;
 }
@@ -37,11 +37,11 @@ float * decast( float * outputfloat,
   /*
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputfloat[i] = (float)(inputchar[i] / 255.0);
+		outputfloat[tidx] = (float)(inputchar[tidx] / 255.0);
 	}
     */
 
-  outputfloat[tidx] = (float)(inputchar[i] / 255.0);
+  outputfloat[tidx] = (float)(inputchar[tidx] / 255.0);
 	return outputfloat;
 
 }
