@@ -7,8 +7,8 @@
 
 //@@ insert code here
 __device__
-unsigned char * cast(unsigned char * outputchar, 
-	float * inputfloat, 
+unsigned char* cast(unsigned char* outputchar, 
+	float* inputfloat, 
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -56,11 +56,12 @@ void grayify(float* outputgray,
 
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
+    //TODO for (int i = 0 )
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
-		inputchar[tidx] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
 
 
