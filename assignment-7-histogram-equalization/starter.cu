@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 
   //get pointers to input and output images
   hostInputImageData = wbImage_getData(inputImage);
-  hostOutputImageData = wbImage_getData(outputImage);
+  //hostOutputImageData = wbImage_getData(outputImage);
 
   //alloc mem and dimensions
   float* cudaInputImageData, cudaOutputImageData;
