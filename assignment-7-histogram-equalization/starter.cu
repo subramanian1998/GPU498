@@ -53,7 +53,7 @@ void grayify(float* outputgray,
 	__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-
+        /*  
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
     //TODO for (int i = 0 )
@@ -64,7 +64,7 @@ void grayify(float* outputgray,
 		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
 
-
+        */
 	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
 
 
