@@ -14,10 +14,14 @@ unsigned char* cast(unsigned char* outputchar,
 	int imageChannels)
 {
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
+  /*
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
 	}
+  */
+
+  outputchar[tidx] = (unsigned char)(255 * inputfloat[i]);
 
 	return outputchar;
 }
@@ -30,11 +34,14 @@ float * decast( float * outputfloat,
 	int imageChannels)
 {
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
+  /*
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		outputfloat[i] = (float)(inputchar[i] / 255.0);
 	}
+    */
 
+  outputfloat[tidx] = (float)(inputchar[i] / 255.0);
 	return outputfloat;
 
 }
@@ -42,13 +49,13 @@ float * decast( float * outputfloat,
 __global__ 
 void grayify(float* outputgray, 
 	float* inputrgb, 
-	unsigned char * inputchar,
+	unsigned char* inputchar,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
 {
 
-	inputchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
+	cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
 	__syncthreads();
 
