@@ -118,7 +118,7 @@ int main(int argc, char **argv)
   imageWidth = wbImage_getWidth(inputImage);
   imageHeight = wbImage_getHeight(inputImage);
   imageChannels = wbImage_getChannels(inputImage);
-  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels);
+  
   wbTime_stop(Generic, "Importing data and creating memory on host");
 
   //@@ insert code here
@@ -149,6 +149,7 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
 
 
+  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
   wbSolution(args, outputImage);
 
   //@@ insert code here
