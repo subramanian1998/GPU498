@@ -55,9 +55,9 @@ void grayify(float* outputgray,
 	int imageChannels)
 {
 
-	cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
+	//cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
-	__syncthreads();
+	//__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
         /*  
@@ -72,9 +72,11 @@ void grayify(float* outputgray,
 	}
 
         */
-	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
-    //if (tidx < imageWidth * imageHeight * imageChannels)
-        //outputgray[tidx] = inputrgb[tidx];
+	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
+  if (tidx < imageWidth * imageHeight * imageChannels)
+      {
+        outputgray[tidx] = inputrgb[tidx];
+      }
 
 }
 
@@ -136,7 +138,7 @@ int main(int argc, char **argv)
   cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
-  	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyHostToDevice);
+  	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
   grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
