@@ -6,6 +6,7 @@
 //TESTING UPDATES BITCH
 
 //@@ insert code here
+/*
 __device__
 unsigned char* cast(unsigned char* outputchar, 
 	float* inputfloat, 
@@ -14,14 +15,14 @@ unsigned char* cast(unsigned char* outputchar,
 	int imageChannels)
 {
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-  /*
+  
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
 	}
-  */
+  
 
-  outputchar[tidx] = (unsigned char)(255); //* inputfloat[tidx]);
+  outputchar[tidx] = (unsigned char)(255); // inputfloat[tidx]);
 
 	return outputchar;
 }
@@ -34,12 +35,12 @@ float * decast( float * outputfloat,
 	int imageChannels)
 {
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-  /*
+  
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		outputfloat[tidx] = (float)(inputchar[tidx] / 255.0);
 	}
-    */
+    
 
   outputfloat[tidx] = (float)(1.0);//inputchar[tidx] / 255.0);
 	return outputfloat;
@@ -60,7 +61,7 @@ void grayify(float* outputgray,
 	//__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-        /*  
+        
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
     //TODO for (int i = 0 )
@@ -71,7 +72,7 @@ void grayify(float* outputgray,
 		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
 
-        */
+        
 	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
   if (tidx < 100)
       {
@@ -79,6 +80,9 @@ void grayify(float* outputgray,
       }
 
 }
+
+
+*/
 
 /*
 __device__ 
@@ -141,8 +145,8 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
-  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
-  	cudaTempImageData, imageWidth, imageHeight, imageChannels);
+  //grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
+  //	cudaTempImageData, imageWidth, imageHeight, imageChannels);
 
 
   cudaDeviceSynchronize();
@@ -154,10 +158,12 @@ int main(int argc, char **argv)
 
 
   wbLog(TRACE, "output is ");
+  /*
   for (int i = 0; i < 10; i++)
   {
     wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
   }
+  */
   outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
   wbSolution(args, outputImage);
 
