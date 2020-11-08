@@ -103,8 +103,8 @@ int main(int argc, char **argv)
   int imageChannels;
   wbImage_t inputImage;
   wbImage_t outputImage;
-  float *hostInputImageData;
-  float *hostOutputImageData;
+  float* hostInputImageData;
+  float* hostOutputImageData;
   const char *inputImageFile;
 
   //@@ Insert more code here
