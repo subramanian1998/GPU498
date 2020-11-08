@@ -1,0 +1,1 @@
+/var/spool/slurmd.spool/job14847276/slurm_script: line 45: 193058 Segmentation fault      (core dumped) ./$1 -e test/$2/output.ppm -i test/$2/input.ppm -o test/$2/attempt.ppm -t image
