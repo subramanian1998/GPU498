@@ -153,6 +153,11 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
 
 
+  wbLog(TRACE, "output is ");
+  for (int i = 0; i < 10; i++)
+  {
+    wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
+  }
   outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
   wbSolution(args, outputImage);
 
