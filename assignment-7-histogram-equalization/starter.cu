@@ -21,7 +21,7 @@ unsigned char* cast(unsigned char* outputchar,
 	}
   */
 
-  outputchar[tidx] = (unsigned char)(255 * inputfloat[tidx]);
+  outputchar[tidx] = (unsigned char)(255); //* inputfloat[tidx]);
 
 	return outputchar;
 }
@@ -41,7 +41,7 @@ float * decast( float * outputfloat,
 	}
     */
 
-  outputfloat[tidx] = (float)(inputchar[tidx] / 255.0);
+  outputfloat[tidx] = (float)(1.0);//inputchar[tidx] / 255.0);
 	return outputfloat;
 
 }
