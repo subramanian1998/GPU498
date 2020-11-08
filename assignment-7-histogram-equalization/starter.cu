@@ -131,8 +131,8 @@ int main(int argc, char **argv)
   float* cudaInputImageData;
   float* cudaOutputImageData;
   unsigned char* cudaTempImageData;
-  cudaMalloc((void **)&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
-  cudaMalloc((void **)&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	sizeof(float) * imageChannels * imageHeight * imageWidth, cudaMemcpyHostToDevice);
