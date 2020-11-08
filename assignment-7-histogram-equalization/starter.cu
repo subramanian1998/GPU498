@@ -73,6 +73,7 @@ void grayify(float* outputgray,
 
         */
 	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
+    if (tidx < imageWidth * imageHeight * imageChannels)
         outputgray[tidx] = inputrgb[tidx];
 
 }
