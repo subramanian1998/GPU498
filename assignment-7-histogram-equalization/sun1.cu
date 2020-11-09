@@ -41,7 +41,7 @@ unsigned char* cast(unsigned char* outputchar,
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
 		//outputchar[i] = (unsigned char)(255.0f * inputfloat[i]);
-	  outputchar[i] = 100;
+	  outputchar[i] = 'c';
   }
 
   
