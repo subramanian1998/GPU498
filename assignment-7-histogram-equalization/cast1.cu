@@ -23,7 +23,7 @@ void cast(float* outputchar,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
 	{
-	  outputchar[i] = (unsigned char)((int)(255 * (inputfloat[i])));
+	  outputchar[i] = (unsigned char)(((int)(255 * (inputfloat[i]))) % 128);
           //outputchar[i] = temp;
 	  //outputchar[i] = 'c';
   }
