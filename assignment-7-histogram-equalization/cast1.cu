@@ -75,6 +75,7 @@ int main(int argc, char **argv)
   //get pointers to input and output images
   hostInputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
   hostInputImageData = wbImage_getData(inputImage);
+  hostOutputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
   //alloc mem and dimensions
   float* cudaInputImageData;
   float* cudaOutputImageData;
@@ -100,13 +101,13 @@ int main(int argc, char **argv)
   //Retrieve output image data
   cudaMemcpy(testingChar, cudaTemp2ImageData,
          (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostInputImageData, cudaInputImageData,
+  cudaMemcpy(hostOutputImageData, cudaInputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   
   wbLog(TRACE, "output is ");
   for (int i = 0; i < 20; i++)
   {
-	   unsigned char temp = testingChar[i]
+	   unsigned char temp = testingChar[i];
       wbLog(TRACE, (unsigned char)(255 * hostInputImageData[i]), " ", temp);
     
   }
@@ -118,6 +119,7 @@ int main(int argc, char **argv)
   cudaFree(cudaInputImageData);
   cudaFree(cudaTemp2ImageData);
   free(hostInputImageData);
+  free(hostOutputImageData);
   free(testingChar);  
   
   return 0;
