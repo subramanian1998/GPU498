@@ -47,6 +47,7 @@ __global__
 void grayify(float* outputgray, 
 	float* inputrgb, 
 	unsigned char* inputchar,
+  unsigned char* outputchar,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -65,7 +66,7 @@ void grayify(float* outputgray,
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
-		//inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		outputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
     if (i < (imageWidth * imageHeight * imageChannels))
     {
       outputgray[i] = inputrgb[i];
@@ -136,15 +137,17 @@ int main(int argc, char **argv)
   float* cudaInputImageData;
   float* cudaOutputImageData;
   unsigned char* cudaTempImageData;
+  unsigned char* cudaTemp2ImageData;
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaTemp2ImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
   grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
-  	cudaTempImageData, imageWidth, imageHeight, imageChannels);
+  	cudaTempImageData, cudaTemp2ImageData, imageWidth, imageHeight, imageChannels);
 
   
   cudaDeviceSynchronize();
@@ -173,6 +176,7 @@ int main(int argc, char **argv)
   cudaFree(cudaInputImageData);
   cudaFree(cudaOutputImageData);
   cudaFree(cudaTempImageData);
+  cudaFree(cudaTemp2ImageData);
   free(hostInputImageData);
   free(hostOutputImageData);
   
