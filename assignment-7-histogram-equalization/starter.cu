@@ -53,7 +53,7 @@ void grayify(float* outputgray,
 	int imageChannels)
 {
 
-	tempchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
+	inputchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
 	__syncthreads();
 
@@ -73,7 +73,7 @@ void grayify(float* outputgray,
 
   __syncthreads();
   
-	outputgray = decast(outputgray, tempchar, imageWidth, imageHeight, imageChannels);
+	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
 
 }
 
