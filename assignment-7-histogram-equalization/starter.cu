@@ -67,12 +67,10 @@ void grayify(float* outputgray,
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
-		tempchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		tempchar[i] = (unsigned char) ((float)(0.21*r) + (float)(0.71*g) + (float)(0.07*b));
 
 	}
   
-
-        
 	outputgray = decast(outputgray, tempchar, imageWidth, imageHeight, imageChannels);
 
 }
