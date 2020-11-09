@@ -162,7 +162,7 @@ int main(int argc, char **argv)
   
   wbLog(TRACE, "output is ");
   
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < imageHeight * imageWidth * imageChannels; i++)
   {
     if (i > 22510) {
       wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
