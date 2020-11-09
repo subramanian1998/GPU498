@@ -66,23 +66,20 @@ int main(int argc, char **argv)
   //get pointers to input and output images
   hostInputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
   hostInputImageData = wbImage_getData(inputImage);
-  hostOutputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
-
   //alloc mem and dimensions
   float* cudaInputImageData;
   float* cudaOutputImageData;
-  unsigned char* cudaTempImageData;
   unsigned char* cudaTemp2ImageData;
   unsigned char* testingChar;
   testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
-  cudaMalloc(&cudaTemp2ImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaTemp2ImageData, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
   cast<<<256,256>>>(cudaTemp2ImageData, cudaInputImageData, 
-        imageWidth, imageHeight, imageChannels);
+        10, 10, 10);
 
   
   cudaDeviceSynchronize();
