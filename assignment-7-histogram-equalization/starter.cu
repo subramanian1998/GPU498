@@ -47,6 +47,7 @@ __global__
 void grayify(float* outputgray, 
 	float* inputrgb, 
 	unsigned char* inputchar,
+  unsigned char* tempchar,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -58,9 +59,9 @@ void grayify(float* outputgray,
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
 
-  unsigned char* tempchar = (unsigned char*)malloc(sizeof(unsigned char) * imageWidth * imageHeight * imageChannels);
-    memcpy(tempchar, inputchar, sizeof(unsigned char) * imageHeight * imageChannels * imageWidth);
-    
+  //unsigned char* tempchar = (unsigned char*)malloc(sizeof(unsigned char) * imageWidth * imageHeight * imageChannels);
+  //memcpy(tempchar, inputchar, sizeof(unsigned char) * imageHeight * imageChannels * imageWidth);
+
   for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
 		float r = inputchar[imageChannels * i];
@@ -133,15 +134,17 @@ int main(int argc, char **argv)
   float* cudaInputImageData;
   float* cudaOutputImageData;
   unsigned char* cudaTempImageData;
+  unsigned char* cudaCharImageData;
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
-  cudaMemcpy(cudaInputImageData, hostInputImageData, 
+  cudaMalloc(&cudaCharImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
+  cudaMemcpy(&cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
   grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
-  	cudaTempImageData, imageWidth, imageHeight, imageChannels);
+  	cudaTempImageData, cudaCharImageData, imageWidth, imageHeight, imageChannels);
 
   
   cudaDeviceSynchronize();
@@ -170,6 +173,7 @@ int main(int argc, char **argv)
   cudaFree(cudaInputImageData);
   cudaFree(cudaOutputImageData);
   cudaFree(cudaTempImageData);
+  cudaFree(cudaCharImageData);
   free(hostInputImageData);
   free(hostOutputImageData);
   
