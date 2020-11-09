@@ -36,12 +36,16 @@ unsigned char* cast(unsigned char* outputchar,
 	int imageHeight, 
 	int imageChannels)
 {
+	for (int i = 0; i< 1000; i++) 
+{
+	outputchar[i] = (unsigned char)('c');
+}
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
   
-	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
+	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i++)
 	{
-		//outputchar[i] = (unsigned char)(255.0f * inputfloat[i]);
-	  outputchar[i] = 'c';
+	  outputchar[i] = (unsigned char)((int)(255.0f * (float)inputfloat[i]));
+	  //outputchar[i] = 'c';
   }
 
   
@@ -246,7 +250,7 @@ int main(int argc, char **argv)
   cudaMemcpy(hostInputImageData, cudaInputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(testingChar, cudaTemp2ImageData,
-         (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
+         (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   
   wbLog(TRACE, "output is ");
   for (int i = 0; i < 20; i++)
