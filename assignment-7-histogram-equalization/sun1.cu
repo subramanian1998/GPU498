@@ -60,7 +60,8 @@ void grayify(float* outputgray,
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
   
 
-
+  //ONLY 1/3 of image and 3x small images
+  //Casting not working
   for (int x = tidx; x < (imageWidth * imageHeight); x += blockDim.x)
   {
     int col = (x) % imageWidth;
@@ -70,7 +71,12 @@ void grayify(float* outputgray,
     float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     float b = inputchar[(imageChannels * ii) + 2] / 255.0;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
-    outputgray[ii] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
+    for (int i = 0 ; i <imageChannels;i++)
+    {
+      outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
+      //outputchar[(imageChannels * ii) + i] = (unsigned char)((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b));
+    }
+    
   }
   
   /*
@@ -96,10 +102,10 @@ void grayify(float* outputgray,
 }
 
 
-
 /*
+//Use total function from list-red
 __device__ 
-unsigned char** hist(unsigned char* inputchar, int imageWidth, int imageHeight)
+unsigned char* hist(unsigned char* inputchar, int imageWidth, int imageHeight)
 {
   unsigned char** hgram = (unsigned char**)
     (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
@@ -107,8 +113,8 @@ unsigned char** hist(unsigned char* inputchar, int imageWidth, int imageHeight)
   for(int i = )
 
 }
-*/
 
+*/
 
 
 

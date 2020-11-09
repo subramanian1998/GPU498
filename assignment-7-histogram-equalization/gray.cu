@@ -43,6 +43,8 @@ float * decast( float * outputfloat,
 
 }
 
+//ONLY 1/3 of image and 3x small images
+//Casting not working
 __global__ 
 void grayify(float* outputgray, 
 	float* inputrgb, 
