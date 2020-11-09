@@ -70,7 +70,7 @@ void grayify(float* outputgray,
     float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     float b = inputchar[(imageChannels * ii) + 2] / 255.0;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
-    outputgray[i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
+    outputgray[ii] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
   }
   
   /*
