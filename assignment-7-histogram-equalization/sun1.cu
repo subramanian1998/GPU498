@@ -102,19 +102,51 @@ void grayify(float* outputgray,
 }
 
 
-/*
+
 //Use total function from list-red
 __device__ 
-unsigned char* hist(unsigned char* inputchar, int imageWidth, int imageHeight)
+unsigned char* histify(unsigned char* inputchar, int imageWidth, int imageHeight)
 {
-  unsigned char** hgram = (unsigned char**)
-    (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
+  //unsigned char** hgram = (unsigned char**)
+  //  (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
 
-  for(int i = )
+  int idx = threadIdx.x;
+  int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
+  
+  volatile __shared__ float hist[256];
+
+  for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
+  {
+    //hist[inputchar[i * 3]] += 1;
+    atomicAdd((hist + inputchar[i * 3]), *(hist + inputchar[i * 3]) += 1);
+    __syncthreads();
+  }
+
+  //have mini histograms done -> test
+//...
 
 }
 
-*/
+//cdf is actually in floats but holds 256 representing characters(rgb vals)
+__device__
+float* calc_cdf(float* cdf, float inputchar, int imageWidth, int imageHeight)
+{
+  cdf[0] = p(inputchar[0], imageWidth, imageHeight);
+  for (int i = 1; i < 256; i++)
+  {
+    cdf[i] = cdf[i - 1] + p(inputchar[i], imageWidth, imageHeight);
+  }
+
+  return cdf;
+}
+
+
+__device__
+float p(float x, int imageWidth, imageHeight)
+{
+  return x / (imageWidth * imageHeight);
+}
+
 
 
 
