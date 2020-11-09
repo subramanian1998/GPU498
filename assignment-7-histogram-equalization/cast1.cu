@@ -78,8 +78,11 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
+  imageHeight = 10;
+  imageWidth = 10;
+  imageChannels = 3;
   cast<<<256,256>>>(cudaTemp2ImageData, cudaInputImageData, 
-        10, 10, 10);
+        imageWidth, imageHeight, imageChannels);
 
   
   cudaDeviceSynchronize();
