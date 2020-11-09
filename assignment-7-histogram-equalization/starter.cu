@@ -26,8 +26,8 @@ unsigned char* cast(unsigned char* outputchar,
 }
 
 __device__
-float * decast( float * outputfloat, 
-	unsigned char * inputchar, 
+float * decast( float* outputfloat, 
+	unsigned char* inputchar, 
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -53,7 +53,7 @@ void grayify(float* outputgray,
 	int imageChannels)
 {
 
-	inputchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
+	tempchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
 	__syncthreads();
 
@@ -67,7 +67,7 @@ void grayify(float* outputgray,
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
-		tempchar[i] = (unsigned char) ((float)(0.21*r) + (float)(0.71*g) + (float)(0.07*b));
+		tempchar[i] = (unsigned char) ((0.21*r) + (0.71*g) + (0.07*b));
 
 	}
 
