@@ -113,12 +113,12 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   //int idx = threadIdx.x;
   int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
   
-  volatile __shared__ float hist[256];
+  __shared__ volatile float hist[256];
 
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    atomicAdd((hist + (int)inputchar[i * 3]), *(hist + (int)inputchar[i * 3]) += 1);
+    //atomicAdd(hist + (int)(inputchar[i * 3]), (int)(*(hist + (int)(inputchar[i * 3])) += 1));
     __syncthreads();
   }
 
