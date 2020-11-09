@@ -62,8 +62,8 @@ void grayify(float* outputgray,
 	//__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-        /*
-      	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
+        
+  for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
     //TODO for (int i = 0 )
 		float r = inputchar[imageChannels * i];
@@ -71,14 +71,16 @@ void grayify(float* outputgray,
 		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
 		//inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+    if (tidx < (imageWidth * imageHeight * imageChannels))
+    {
+      outputgray[tidx] = inputrgb[tidx];
+    }
+
 	}
-        */
+        
         
 	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
-  if (tidx < (imageWidth * imageHeight * imageChannels * 3))
-      {
-        outputgray[tidx] = inputrgb[tidx];
-      }
+  
 
 }
 
@@ -162,7 +164,9 @@ int main(int argc, char **argv)
   
   for (int i = 0; i < 10; i++)
   {
-    wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
+    if (i > 22510) {
+      wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
+    }
   }
   
  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
