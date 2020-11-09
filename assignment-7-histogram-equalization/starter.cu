@@ -135,7 +135,7 @@ int main(int argc, char **argv)
   //get pointers to input and output images
   hostInputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
   hostInputImageData = wbImage_getData(inputImage);
-  hostOutputImageData = (float *)malloc(sizeof(hostInputImageData));
+  hostOutputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
 
   //alloc mem and dimensions
   float* cudaInputImageData;
@@ -164,7 +164,9 @@ int main(int argc, char **argv)
   
   for (int i = 0; i < imageHeight * imageWidth * imageChannels; i++)
   {
-    if (i > 22510) {
+    //22510
+    //36010
+    if (i > 36010) {
       wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i] );
     }
   }
