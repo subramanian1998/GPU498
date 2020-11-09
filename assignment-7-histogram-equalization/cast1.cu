@@ -23,10 +23,19 @@ void cast(float* outputchar,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
 	{
-	  outputchar[i] = (unsigned char)(((int)(255 * (inputfloat[i]))) % 128);
+	  outputchar[i] = (unsigned char)((int)(255 * (inputfloat[i])));
           //outputchar[i] = temp;
 	  //outputchar[i] = 'c';
   }
+
+  for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
+  {
+    inputfloat[i] = (float)((outputchar[i] / 255.0f));
+          //outputchar[i] = temp;
+    //outputchar[i] = 'c';
+  }
+
+
 
 }
 
@@ -91,12 +100,14 @@ int main(int argc, char **argv)
   //Retrieve output image data
   cudaMemcpy(testingChar, cudaTemp2ImageData,
          (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
+  cudaMemcpy(hostInputImageData, cudaInputImageData,
+         (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   
   wbLog(TRACE, "output is ");
   for (int i = 0; i < 20; i++)
   {
-	
-      wbLog(TRACE,i, " ", testingChar[i] );
+	   unsigned char temp = testingChar[i]
+      wbLog(TRACE, hostInputImageData[i], " ", temp);
     
   }
   
