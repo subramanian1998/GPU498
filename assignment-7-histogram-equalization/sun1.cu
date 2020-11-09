@@ -40,7 +40,7 @@ unsigned char* cast(unsigned char* outputchar,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputchar[i] = (unsigned char)(255 * inputfloat[i]);
+		outputchar[i] = (unsigned char)(255.0f * inputfloat[i]);
 	}
   
 
@@ -58,7 +58,7 @@ float * decast( float * outputfloat,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputfloat[tidx] = (float)(inputchar[i] / 255.0);
+		outputfloat[i] = (float)(inputchar[i] / 255.0f);
 	}
     
 	return outputfloat;
@@ -92,9 +92,9 @@ void grayify(float* outputgray,
     //float r = inputchar[imageChannels * ii] / 255.0 ;
     //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
-    unsigned char r = 0.21 * inputchar[imageChannels * ii];
-    unsigned char g =  0.71 * inputchar[(imageChannels * ii) + 1];
-    unsigned char b = 0.07 * inputchar[(imageChannels * ii) + 2] ;
+    unsigned char r = (unsigned char)(0.21 * inputchar[imageChannels * ii]);
+    unsigned char g =  (unsigned char)(0.71 * inputchar[(imageChannels * ii) + 1]);
+    unsigned char b = (unsigned char)(0.07 * inputchar[(imageChannels * ii) + 2]) ;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
     for (int i = 0 ; i <imageChannels;i++)
     {
