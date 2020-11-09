@@ -83,20 +83,22 @@ int main(int argc, char **argv)
   float* cudaOutputImageData;
   float* cudaTemp2ImageData;
   unsigned char* testingChar;
+  unsigned char* confirmedChar;
   testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
+  confirmedChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTemp2ImageData, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
-  testingChar[0] = (unsigned char)(255 * hostInputImageData[0]);
-  wbLog(TRACE, "output is ", testingChar[0], ' ', (unsigned char)(255 * hostInputImageData[0]) );
+  for (int i = 0; i < imageChannels * imageHeight * imageWidth; i++ )
+  {
+    confirmedChar[i] = (unsigned char)(255 * (hostInputImageData[i]));
+  }
+  //wbLog(TRACE, "output is ", testingChar[0], ' ', (unsigned char)(255 * hostInputImageData[0]) );
 
 
   //send data to kernel
-  imageHeight = 10;
-  imageWidth = 10;
-  imageChannels = 3;
   cast<<<256,256>>>(cudaTemp2ImageData, cudaInputImageData, 
         imageWidth, imageHeight, imageChannels);
 
@@ -114,8 +116,8 @@ int main(int argc, char **argv)
   for (int i = 0; i < 20; i++)
   {
 	   unsigned char temp = testingChar[i];
-      wbLog(TRACE, (unsigned char)(255 * (hostInputImageData[i])), " ", temp);
-    
+     wbLog(TRACE, "char" , confirmedChar[i], " ", temp);
+     wbLog(TRACE, "float" , hostInputImageData[i] , " ", hostOutputImageData[i]);
   }
   
  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
