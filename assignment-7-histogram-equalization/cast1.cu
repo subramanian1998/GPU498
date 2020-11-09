@@ -9,8 +9,9 @@
 
 
 __global__
-void cast(float* outputchar, 
+void cast(unsigned char* outputchar, 
 	float* inputfloat, 
+  float* outputfloat,
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
@@ -32,7 +33,7 @@ void cast(float* outputchar,
 
   for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
   {
-    inputfloat[i] = (float)((outputchar[i] / 255.0f));
+    outputfloat[i] = (float)((outputchar[i] / 255.0f));
           //outputchar[i] = temp;
     //outputchar[i] = 'c';
   }
@@ -81,12 +82,14 @@ int main(int argc, char **argv)
   //alloc mem and dimensions
   float* cudaInputImageData;
   float* cudaOutputImageData;
-  float* cudaTemp2ImageData;
+  float* cudaTempImageData;
+  unsigned char* cudaTemp2ImageData;
   unsigned char* testingChar;
   unsigned char* confirmedChar;
   testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   confirmedChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaTempImageData, (sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTemp2ImageData, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
@@ -99,7 +102,7 @@ int main(int argc, char **argv)
 
 
   //send data to kernel
-  cast<<<256,256>>>(cudaTemp2ImageData, cudaInputImageData, 
+  cast<<<256,256>>>(cudaTemp2ImageData, cudaInputImageData, cudaTempImageData,
         imageWidth, imageHeight, imageChannels);
 
   
@@ -109,7 +112,7 @@ int main(int argc, char **argv)
   //Retrieve output image data
   cudaMemcpy(testingChar, cudaTemp2ImageData,
          (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostOutputImageData, cudaInputImageData,
+  cudaMemcpy(hostOutputImageData, cudaTempImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   
   wbLog(TRACE, "output is ");
