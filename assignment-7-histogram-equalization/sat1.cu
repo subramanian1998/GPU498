@@ -159,16 +159,13 @@ int main(int argc, char **argv)
 
   
   wbLog(TRACE, "output is ");
-  /*  
-  for (int i = 0; i < imageHeight * imageWidth * imageChannels; i++)
+  for (int i = 0; i < 10; i++)
   {
-    //22510
-    //36010
-    if (i > 36010) {
+
       wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i] );
-    }
+    
   }
-  */
+  
  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
  wbSolution(args, outputImage);
 
