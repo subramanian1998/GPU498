@@ -96,7 +96,7 @@ void grayify(float* outputgray,
     for (int i = 0 ; i <imageChannels;i++)
     {
       outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
-      //outputchar[(imageChannels * ii) + i] = (unsigned char)((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b));
+      outputchar[(imageChannels * ii) + i] = (unsigned char)((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b));
     }
     
   }
@@ -118,7 +118,7 @@ void grayify(float* outputgray,
 	}
         */
         
-	//outputgray = decast(outputgray, outputchar, imageWidth, imageHeight, imageChannels);
+	inputrgb = decast(inputrgb, outputchar, imageWidth, imageHeight, imageChannels);
   
 
 }
@@ -233,13 +233,16 @@ int main(int argc, char **argv)
   //Retrieve output image data
   cudaMemcpy(hostOutputImageData, cudaOutputImageData, 
   	(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
+  //for testing purps
+  cudaMemcpy(cudaTemp2ImageData, cudaTemp2ImageData,
+         (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
 
   
   wbLog(TRACE, "output is ");
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 20; i++)
   {
-
-      wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i] );
+	
+      wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i], " ", hostInputImageData[i] );
     
   }
   
