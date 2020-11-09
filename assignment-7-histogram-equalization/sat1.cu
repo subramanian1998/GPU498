@@ -63,8 +63,8 @@ void grayify(float* outputgray,
 
   for (int x = tidx; x < imageWidth * imageHeight; x += blockDim.x)
   {
-    int col = x % imageWidth;
-    int row = x / imageWidth;
+    int col = (x / imageChannels) % imageWidth;
+    int row = (x / imageChannels) / imageWidth;
     int ii = (row * imageWidth) + col;
     float r = inputchar[imageChannels * ii] / 255.0 ;
     float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
