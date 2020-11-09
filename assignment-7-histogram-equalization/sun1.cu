@@ -118,7 +118,7 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    atomicAdd((hist + inputchar[i * 3]), *(hist + inputchar[i * 3]) += 1);
+    atomicAdd((hist + (int)inputchar[i * 3]), *(hist + (int)inputchar[i * 3]) += 1);
     __syncthreads();
   }
 
@@ -136,7 +136,7 @@ float p(float x, int imageWidth, int imageHeight)
 
 //cdf is actually in floats but holds 256 representing characters(rgb vals)
 __device__
-float* calc_cdf(float* cdf, float inputchar, int imageWidth, int imageHeight)
+float* calc_cdf(float* cdf, float* inputchar, int imageWidth, int imageHeight)
 {
   cdf[0] = p(inputchar[0], imageWidth, imageHeight);
   for (int i = 1; i < 256; i++)
