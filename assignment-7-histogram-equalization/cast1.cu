@@ -8,28 +8,25 @@
 //@@ insert code here
 
 
-__device__
-unsigned char* cast(unsigned char* outputchar, 
+__global__
+void cast(unsigned char* outputchar, 
 	float* inputfloat, 
 	int imageWidth, 
 	int imageHeight, 
 	int imageChannels)
 {
-	for (int i = 0; i< 1000; i++) 
+	/*	for (int i = 0; i< 1000; i++) 
 {
 	outputchar[i] = (unsigned char)('c');
-}
+}*/
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
 	{
-	  outputchar[i] = (unsigned char)((int)(255 * (float)inputfloat[i]));
+	  outputchar[i] = (unsigned char)((255 * (inputfloat[i])));
 	  //outputchar[i] = 'c';
   }
 
-  
-
-	return outputchar;
 }
 
 
@@ -107,8 +104,6 @@ int main(int argc, char **argv)
 
   //@@ insert code here
   cudaFree(cudaInputImageData);
-  cudaFree(cudaOutputImageData);
-  cudaFree(cudaTempImageData);
   cudaFree(cudaTemp2ImageData);
   free(hostInputImageData);
   free(hostOutputImageData);
