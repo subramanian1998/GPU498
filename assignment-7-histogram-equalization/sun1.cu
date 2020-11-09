@@ -7,7 +7,7 @@
 
 //@@ insert code here
 
-__device__ inline void atomicAdd(float* address, float value)
+__device__ inline void atomicAdd2(float* address, float value)
 
 {
 
@@ -135,12 +135,12 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   //int idx = threadIdx.x;
   int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
   
-  __shared__ volatile float hist[256];
+  __shared__ float hist[256];
 
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
+    atomicAdd2(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
     __syncthreads();
   }
 
