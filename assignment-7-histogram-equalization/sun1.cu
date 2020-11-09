@@ -92,14 +92,14 @@ void grayify(float* outputgray,
     //float r = inputchar[imageChannels * ii] / 255.0 ;
     //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
-    unsigned char r = inputchar[imageChannels * ii];
-    unsigned char g = inputchar[(imageChannels * ii) + 1];
-    unsigned char b = inputchar[(imageChannels * ii) + 2] ;
+    unsigned char r = 0.21 * inputchar[imageChannels * ii];
+    unsigned char g =  0.71 * inputchar[(imageChannels * ii) + 1];
+    unsigned char b = 0.07 * inputchar[(imageChannels * ii) + 2] ;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
     for (int i = 0 ; i <imageChannels;i++)
     {
-      outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
-      outputchar[(imageChannels * ii) + i] = (unsigned char)((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b));
+      //outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
+      outputchar[(imageChannels * ii) + i] = (unsigned char)(r + g + b);
       /*
         output
       */
