@@ -42,9 +42,9 @@ unsigned char* cast(unsigned char* outputchar,
 }
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
   
-	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i++)
+	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
 	{
-	  outputchar[i] = (unsigned char)((int)(255.0f * (float)inputfloat[i]));
+	  outputchar[i] = (unsigned char)((int)(255 * (float)inputfloat[i]));
 	  //outputchar[i] = 'c';
   }
 
@@ -130,7 +130,7 @@ void grayify(float* outputgray,
 	}
         */
         
-	inputrgb = decast(inputrgb, outputchar, imageWidth, imageHeight, imageChannels);
+	//inputrgb = decast(inputrgb, outputchar, imageWidth, imageHeight, imageChannels);
   
 
 }
@@ -152,8 +152,9 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    atomicAdd2(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
+    atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
     __syncthreads();
+
   }
 
   //have mini histograms done -> test
@@ -227,7 +228,8 @@ int main(int argc, char **argv)
   float* cudaOutputImageData;
   unsigned char* cudaTempImageData;
   unsigned char* cudaTemp2ImageData;
-  unsigned char* testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
+  unsigned char* testingChar;
+  testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
