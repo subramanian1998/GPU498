@@ -42,10 +42,11 @@ float * decast( float * outputfloat,
 	}
     
 
-  outputfloat[tidx] = (float)(1.0);//inputchar[tidx] / 255.0);
+        outputfloat[tidx] = (float)(1.0);//inputchar[tidx] / 255.0);
 	return outputfloat;
 
 }
+*/ 
 
 __global__ 
 void grayify(float* outputgray, 
@@ -61,20 +62,20 @@ void grayify(float* outputgray,
 	//__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
-        
-	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
+        /*
+      	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
     //TODO for (int i = 0 )
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
-		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		//inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 	}
-
+        */
         
 	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
-  if (tidx < 100)
+  if (tidx < (imageWidth * imageHeight * imageChannels))
       {
         outputgray[tidx] = inputrgb[tidx];
       }
@@ -82,7 +83,6 @@ void grayify(float* outputgray,
 }
 
 
-*/
 
 /*
 __device__ 
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 
   //get pointers to input and output images
   hostInputImageData = wbImage_getData(inputImage);
-  //hostOutputImageData = wbImage_getData(outputImage);
+  hostOutputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
 
   //alloc mem and dimensions
   float* cudaInputImageData;
@@ -145,18 +145,18 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   //send data to kernel
-  //grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
-  //	cudaTempImageData, imageWidth, imageHeight, imageChannels);
+  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, 
+  	cudaTempImageData, imageWidth, imageHeight, imageChannels);
 
-
+  
   cudaDeviceSynchronize();
 
-
+  
   //Retrieve output image data
   cudaMemcpy(hostOutputImageData, cudaOutputImageData, 
-  	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
+  	(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
 
-
+  
   wbLog(TRACE, "output is ");
   /*
   for (int i = 0; i < 10; i++)
@@ -164,13 +164,17 @@ int main(int argc, char **argv)
     wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
   }
   */
-  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
-  wbSolution(args, outputImage);
+ //outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
+ // wbSolution(args, outputImage);
 
   //@@ insert code here
-
+  cudaFree(cudaInputImageData);
+  cudaFree(cudaOutputImageData);
+  cudaFree(cudaTempImageData);
+  free(hostInputImageData);
+  free(hostOutputImageData);
   
-
+  
   return 0;
 
 }
