@@ -107,7 +107,6 @@ int main(int argc, char **argv)
   cudaFree(cudaInputImageData);
   cudaFree(cudaTemp2ImageData);
   free(hostInputImageData);
-  free(hostOutputImageData);
   free(testingChar);  
   
   return 0;
