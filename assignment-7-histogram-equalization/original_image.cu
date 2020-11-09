@@ -6,7 +6,7 @@
 //TESTING UPDATES BITCH
 
 //@@ insert code here
-
+/*
 __device__
 unsigned char* cast(unsigned char* outputchar, 
 	float* inputfloat, 
@@ -22,6 +22,8 @@ unsigned char* cast(unsigned char* outputchar,
 	}
   
 
+  outputchar[tidx] = (unsigned char)(255); // inputfloat[tidx]);
+
 	return outputchar;
 }
 
@@ -36,12 +38,15 @@ float * decast( float * outputfloat,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x)
 	{
-		outputfloat[i] = (float)(inputchar[i] / 255.0);
+		outputfloat[tidx] = (float)(inputchar[tidx] / 255.0);
 	}
     
+
+        outputfloat[tidx] = (float)(1.0);//inputchar[tidx] / 255.0);
 	return outputfloat;
 
 }
+*/ 
 
 __global__ 
 void grayify(float* outputgray, 
@@ -52,9 +57,9 @@ void grayify(float* outputgray,
 	int imageChannels)
 {
 
-	inputchar = cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
+	//cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels);
 	
-	__syncthreads();
+	//__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
         
@@ -64,12 +69,17 @@ void grayify(float* outputgray,
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
-		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		__syncthreads();
+		//inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+    if (i < (imageWidth * imageHeight * imageChannels))
+    {
+      outputgray[i] = inputrgb[i];
+    }
 
 	}
         
         
-	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
+	//outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
   
 
 }
