@@ -70,6 +70,8 @@ void grayify(float* outputgray,
 		tempchar[i] = (unsigned char) ((float)(0.21*r) + (float)(0.71*g) + (float)(0.07*b));
 
 	}
+
+  __syncthreads();
   
 	outputgray = decast(outputgray, tempchar, imageWidth, imageHeight, imageChannels);
 
