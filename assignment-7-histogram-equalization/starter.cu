@@ -165,7 +165,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < imageHeight * imageWidth * imageChannels; i++)
   {
     if (i > 22510) {
-      wbLog(TRACE, hostInputImageData[i], " ", hostOutputImageData[i] );
+      wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i] );
     }
   }
   
