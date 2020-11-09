@@ -107,7 +107,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 20; i++)
   {
 	   unsigned char temp = testingChar[i]
-      wbLog(TRACE, hostInputImageData[i], " ", temp);
+      wbLog(TRACE, (unsigned char)(255 * hostInputImageData[i]), " ", temp);
     
   }
   
