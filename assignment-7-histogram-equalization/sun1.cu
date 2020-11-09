@@ -118,7 +118,7 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    //atomicAdd(hist + (int)(inputchar[i * 3]), (int)(*(hist + (int)(inputchar[i * 3])) += 1));
+    atomicAdd(&hist[(inputchar[i * 3])], (int)(*hist[(inputchar[i * 3])]) += 1);
     __syncthreads();
   }
 
