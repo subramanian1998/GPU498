@@ -131,6 +131,7 @@ int main(int argc, char **argv)
   //@@ insert code here
 
   //get pointers to input and output images
+  hostInputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
   hostInputImageData = wbImage_getData(inputImage);
   hostOutputImageData = (float *)malloc(imageWidth * imageHeight * imageChannels * sizeof(float));
 
