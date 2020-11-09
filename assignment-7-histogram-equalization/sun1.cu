@@ -7,6 +7,28 @@
 
 //@@ insert code here
 
+__device__ inline void atomicAdd(float* address, float value)
+
+{
+
+  float old = value;  
+
+  float new_old;
+
+do
+
+  {
+
+  new_old = atomicExch(address, 0.0f);
+
+  new_old += old;
+
+  }
+
+  while ((old = atomicExch(address, new_old))!=0.0f);
+
+};
+
 __device__
 unsigned char* cast(unsigned char* outputchar, 
 	float* inputfloat, 
@@ -118,7 +140,7 @@ void histify(unsigned char* inputchar, int imageWidth, int imageHeight)
   for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
   {
     //hist[inputchar[i * 3]] += 1;
-    atomicAdd(&hist[(inputchar[i * 3])], (int)(*hist[(inputchar[i * 3])]) += 1);
+    atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
     __syncthreads();
   }
 
