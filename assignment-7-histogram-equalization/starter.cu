@@ -57,20 +57,20 @@ void grayify(float* outputgray,
 	__syncthreads();
 
 	int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
+
+  unsigned char* tempchar = (unsigned char*)malloc(sizeof(unsigned char) * imageWidth * imageHeight * imageChannels);
         
   for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
 	{
-    //TODO for (int i = 0 )
 		float r = inputchar[imageChannels * i];
 		float g = inputchar[(imageChannels * i) + 1];
 		float b = inputchar[(imageChannels * i) + 2];
-		inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
+		tempchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
 
 	}
         
         
-	outputgray = decast(outputgray, inputchar, imageWidth, imageHeight, imageChannels);
-  
+	outputgray = decast(outputgray, tempchar, imageWidth, imageHeight, imageChannels);
 
 }
 
