@@ -90,6 +90,8 @@ int main(int argc, char **argv)
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
   testingChar[0] = (unsigned char)(255 * hostInputImageData[0]);
+  wbLog(TRACE, "output is ", testingChar[0], ' ', (unsigned char)(255 * hostInputImageData[0]) );
+
 
   //send data to kernel
   imageHeight = 10;
@@ -112,7 +114,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 20; i++)
   {
 	   unsigned char temp = testingChar[i];
-      wbLog(TRACE, (unsigned char)(255 * hostInputImageData[i]), " ", temp);
+      wbLog(TRACE, (unsigned char)(255 * (hostInputImageData[i])), " ", temp);
     
   }
   
