@@ -71,9 +71,9 @@ void grayify(float* outputgray,
 		float b = inputchar[(imageChannels * i) + 2];
 		__syncthreads();
 		//inputchar[i] = (unsigned char) (0.21*r + 0.71*g + 0.07*b);
-    if (tidx < (imageWidth * imageHeight * imageChannels))
+    if (i < (imageWidth * imageHeight * imageChannels))
     {
-      outputgray[tidx] = inputrgb[tidx];
+      outputgray[i] = inputrgb[i];
     }
 
 	}
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 
   
   wbLog(TRACE, "output is ");
-  
+  /*  
   for (int i = 0; i < imageHeight * imageWidth * imageChannels; i++)
   {
     //22510
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
       wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i] );
     }
   }
-  
+  */
  outputImage = wbImage_new(imageWidth, imageHeight, imageChannels, hostOutputImageData);
  wbSolution(args, outputImage);
 
