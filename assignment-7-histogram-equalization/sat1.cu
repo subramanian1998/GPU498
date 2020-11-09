@@ -61,7 +61,7 @@ void grayify(float* outputgray,
   
 
 
-  for (int x = tidx; x < imageWidth * imageHeight; x += blockDim.x)
+  for (int x = tidx; x < imageWidth * imageHeight * 3; x += blockDim.x)
   {
     int col = (x / imageChannels) % imageWidth;
     int row = (x / imageChannels) / imageWidth;
