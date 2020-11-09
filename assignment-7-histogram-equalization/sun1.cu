@@ -89,14 +89,20 @@ void grayify(float* outputgray,
     int col = (x) % imageWidth;
     int row = (x) / imageWidth;
     int ii = (row * imageWidth) + col;
-    float r = inputchar[imageChannels * ii] / 255.0 ;
-    float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
-    float b = inputchar[(imageChannels * ii) + 2] / 255.0;
+    //float r = inputchar[imageChannels * ii] / 255.0 ;
+    //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
+    //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
+    unsigned char r = inputchar[imageChannels * ii];
+    unsigned char g = inputchar[(imageChannels * ii) + 1];
+    unsigned char b = inputchar[(imageChannels * ii) + 2] ;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
     for (int i = 0 ; i <imageChannels;i++)
     {
       outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
       outputchar[(imageChannels * ii) + i] = (unsigned char)((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b));
+      /*
+        output
+      */
     }
     
   }
@@ -215,6 +221,7 @@ int main(int argc, char **argv)
   float* cudaOutputImageData;
   unsigned char* cudaTempImageData;
   unsigned char* cudaTemp2ImageData;
+  unsigned char* testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaTempImageData, (int)(sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
@@ -234,15 +241,16 @@ int main(int argc, char **argv)
   cudaMemcpy(hostOutputImageData, cudaOutputImageData, 
   	(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   //for testing purps
-  cudaMemcpy(cudaTemp2ImageData, cudaTemp2ImageData,
+  cudaMemcpy(hostInputImageData, cudaInputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-
+  cudaMemcpy(testingChar, cudaTemp2ImageData,
+         (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   
   wbLog(TRACE, "output is ");
   for (int i = 0; i < 20; i++)
   {
 	
-      wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i], " ", hostInputImageData[i] );
+      wbLog(TRACE,i, " ", hostInputImageData[i], " ", hostOutputImageData[i], " ", testingChar[i] );
     
   }
   
@@ -256,7 +264,7 @@ int main(int argc, char **argv)
   cudaFree(cudaTemp2ImageData);
   free(hostInputImageData);
   free(hostOutputImageData);
-  
+  free(testingChar);  
   
   return 0;
 
