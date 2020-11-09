@@ -23,10 +23,12 @@ void cast(float* outputchar,
   
 	for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
 	{
-	  outputchar[i] = (unsigned char)((int)(255 * (inputfloat[i])));
+	  outputchar[i] = (unsigned char)((255 * (inputfloat[i])));
           //outputchar[i] = temp;
 	  //outputchar[i] = 'c';
   }
+
+  __syncthreads();
 
   for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i+= blockDim.x * gridDim.x)
   {
@@ -86,6 +88,8 @@ int main(int argc, char **argv)
   cudaMalloc(&cudaTemp2ImageData, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
+
+  testingChar[0] = (unsigned char)(255 * hostInputImageData[0]);
 
   //send data to kernel
   imageHeight = 10;
