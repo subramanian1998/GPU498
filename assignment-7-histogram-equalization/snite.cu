@@ -64,6 +64,7 @@ void grayify(float* outputgray,
   float* inputrgb, 
   float* hist,
   unsigned char* outputchar,
+  unsigned char* inputchar,
   int imageWidth, 
   int imageHeight, 
   int imageChannels)
@@ -86,9 +87,9 @@ void grayify(float* outputgray,
     //float r = inputchar[imageChannels * ii] / 255.0 ;
     //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
-    unsigned char r = (unsigned char)(0.21 * outputchar[imageChannels * ii]);
-    unsigned char g =  (unsigned char)(0.71 * outputchar[(imageChannels * ii) + 1]);
-    unsigned char b = (unsigned char)(0.07 * outputchar[(imageChannels * ii) + 2]) ;
+    unsigned char r = (unsigned char)(0.21 * inputchar[imageChannels * ii]);
+    unsigned char g =  (unsigned char)(0.71 * inputchar[(imageChannels * ii) + 1]);
+    unsigned char b = (unsigned char)(0.07 * inputchar[(imageChannels * ii) + 2]) ;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
     __syncthreads();
     for (int i = 0 ; i <imageChannels;i++)
@@ -145,7 +146,8 @@ int main(int argc, char **argv)
   //alloc mem and dimensions
   float* cudaInputImageData;
   float* cudaOutputImageData;
-  unsigned char* cudaChar;
+  unsigned char* cudaInputChar;
+  unsigned char* cudaOutputChar;
   float* cudaHist;
   float* hostHist;
   hostHist = (float *)malloc(256 * sizeof(float));
@@ -156,7 +158,8 @@ int main(int argc, char **argv)
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaHist, (sizeof(float) * 256));
-  cudaMalloc(&cudaChar, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaInputChar, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
+  cudaMalloc(&cudaOutputChar, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
 
@@ -170,7 +173,7 @@ int main(int argc, char **argv)
 
 
   //send data to kernel
-  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaChar,
+  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaOutputChar, cudaInputChar,
         imageWidth, imageHeight, imageChannels);
 
   
@@ -182,7 +185,7 @@ int main(int argc, char **argv)
    //      (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostOutputImageData, cudaOutputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostHist, cudaHist,
+  cudaMemcpy(hostHist, cudaOutputHist,
          (sizeof(float) * 256), cudaMemcpyDeviceToHost);
   
   
@@ -201,7 +204,8 @@ int main(int argc, char **argv)
 
   //@@ insert code here
   cudaFree(cudaInputImageData);
-  cudaFree(cudaChar);
+  cudaFree(cudaOutputChar);
+  cudaFree(cudaInputChar);
   cudaFree(cudaHist);
   free(hostInputImageData);
   free(hostOutputImageData);
