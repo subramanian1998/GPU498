@@ -70,7 +70,7 @@ void grayify(float* outputgray,
   int imageChannels)
 {
 
-  cast(outputchar, inputrgb, imageWidth, imageHeight, imageChannels, 1);
+  cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels, 1);
   
   __syncthreads();
 
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
    //      (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostOutputImageData, cudaOutputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostHist, cudaOutputHist,
+  cudaMemcpy(hostHist, cudaHist,
          (sizeof(float) * 256), cudaMemcpyDeviceToHost);
   
   
