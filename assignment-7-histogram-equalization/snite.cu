@@ -97,7 +97,7 @@ float p(unsigned char x, int imageWidth, int imageHeight)
 
 //cdf is actually in floats but holds 256 representing characters(rgb vals)
 __device__
-float* calc_cdf(float* cdf, unsigned char* inputchar, int imageWidth, int imageHeight)
+float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 {
   cdf[0] = p(inputchar[0], imageWidth, imageHeight);
   for (int i = 1; i < 256; i++)
@@ -108,11 +108,24 @@ float* calc_cdf(float* cdf, unsigned char* inputchar, int imageWidth, int imageH
   return cdf;
 }
 
+__device__
+float correct_val(float* cdf, unsigned char val)
+{
+  return clamp(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0]), 0, 255.0);
+}
+
+__device__
+float clamp(float x, float start, float end)
+{
+  return min(max(x, start), end);
+}
+
 
 __global__ 
 void grayify(float* outputgray, 
   float* inputrgb, 
   float* hist,
+  float* cdf,
   unsigned char* outputchar,
   unsigned char* inputchar,
   int imageWidth, 
@@ -148,9 +161,11 @@ void grayify(float* outputgray,
   //histify
   histify(hist, outputchar, imageWidth, imageHeight);
 
+  //calc hist
+  calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-
+  
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
@@ -205,6 +220,9 @@ int main(int argc, char **argv)
   float* hostHist;
   hostHist = (float *)malloc(256 * sizeof(float));
 
+  float* cudaCdf;
+  cudaMalloc(&cudaCdf, (sizeof(float) * 256));
+
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaHist, (sizeof(float) * 256));
@@ -216,7 +234,7 @@ int main(int argc, char **argv)
 
 
   //send data to kernel
-  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaOutputChar, cudaInputChar,
+  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaCdf, cudaOutputChar, cudaInputChar,
         imageWidth, imageHeight, imageChannels);
 
   
