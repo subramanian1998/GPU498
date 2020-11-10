@@ -278,7 +278,7 @@ int main(int argc, char **argv)
    //      (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostOutputImageData, cudaOutputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostHist, cudaCdf,
+  cudaMemcpy(hostHist, cudaHist,
          (sizeof(float) * 256), cudaMemcpyDeviceToHost);
   
   
