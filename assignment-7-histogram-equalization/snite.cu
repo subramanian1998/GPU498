@@ -115,7 +115,7 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
 __device__
 float p(unsigned char x, int imageWidth, int imageHeight)
 {
-  return (float)(x / (imageWidth * imageHeight));
+  return (float)( (x * 1.0f) / (imageWidth * imageHeight));
 }
 
 
