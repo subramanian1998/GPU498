@@ -73,8 +73,6 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
 
   for (int x = 0; x < gridDim.x; x++)
   {
-    if (blockIdx.x == x)
-    {
       for (int i = tidx; i < imageWidth * imageHeight; i += blockDim.x * gridDim.x)
       {
         //hist[inputchar[i * 3]] += 1;
@@ -84,8 +82,6 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
         //atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
         __syncthreads();
       }
-      __syncthreads();
-    }
 
    __syncthreads();
     
@@ -135,7 +131,7 @@ float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 __device__
 unsigned char clamp(unsigned char x, unsigned char start, unsigned char end)
 {
-  return fmin(fmax(x, start), end);
+  return min(max(x, start), end);
 }
 
 __device__
