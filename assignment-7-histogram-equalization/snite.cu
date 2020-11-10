@@ -99,10 +99,10 @@ float p(unsigned char x, int imageWidth, int imageHeight)
 __device__
 float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 {
-  cdf[0] = p(inputchar[0], imageWidth, imageHeight);
+  cdf[0] = p(hist[0], imageWidth, imageHeight);
   for (int i = 1; i < 256; i++)
   {
-    cdf[i] = cdf[i - 1] + p(inputchar[i], imageWidth, imageHeight);
+    cdf[i] = cdf[i - 1] + p(hist[i], imageWidth, imageHeight);
   }
 
   return cdf;
