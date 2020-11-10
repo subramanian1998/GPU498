@@ -146,7 +146,7 @@ void grayify(float* outputgray,
   }
 
   //histify
-  hist = histify(hist, outputchar, imageWidth, imageHeight);
+  histify(hist, outputchar, imageWidth, imageHeight);
 
 
   //apply hist to image
