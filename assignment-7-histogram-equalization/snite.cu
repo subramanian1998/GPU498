@@ -70,9 +70,8 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
   
   __shared__ float hist[256];
 
-  int min = 0;
 
-  for (int x = 0; i < gridDim.x, i++)
+  for (int x = 0; x < gridDim.x; x++)
   {
     if (blockIdx.x == x)
     {
