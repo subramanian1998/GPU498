@@ -86,10 +86,11 @@ void grayify(float* outputgray,
     //float r = inputchar[imageChannels * ii] / 255.0 ;
     //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
     //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
-    unsigned char r = (unsigned char)(0.21 * inputchar[imageChannels * ii]);
-    unsigned char g =  (unsigned char)(0.71 * inputchar[(imageChannels * ii) + 1]);
-    unsigned char b = (unsigned char)(0.07 * inputchar[(imageChannels * ii) + 2]) ;
+    unsigned char r = (unsigned char)(0.21 * outputchar[imageChannels * ii]);
+    unsigned char g =  (unsigned char)(0.71 * outputchar[(imageChannels * ii) + 1]);
+    unsigned char b = (unsigned char)(0.07 * outputchar[(imageChannels * ii) + 2]) ;
     //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
+    __syncthreads();
     for (int i = 0 ; i <imageChannels;i++)
     {
       //outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
@@ -169,7 +170,7 @@ int main(int argc, char **argv)
 
 
   //send data to kernel
-  cast<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaChar,
+  grayify<<<256,256>>>(cudaOutputImageData, cudaInputImageData, cudaHist, cudaChar,
         imageWidth, imageHeight, imageChannels);
 
   
@@ -177,8 +178,8 @@ int main(int argc, char **argv)
 
   
   //Retrieve output image data
-  cudaMemcpy(testingChar, cudaChar,
-         (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
+  //cudaMemcpy(testingChar, cudaChar,
+   //      (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostOutputImageData, cudaOutputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostHist, cudaHist,
@@ -200,10 +201,11 @@ int main(int argc, char **argv)
 
   //@@ insert code here
   cudaFree(cudaInputImageData);
-  cudaFree(cudaTemp2ImageData);
+  cudaFree(cudaChar);
+  cudaFree(cudaHist);
   free(hostInputImageData);
   free(hostOutputImageData);
-  free(testingChar);  
+  //free(testingChar);  
   
   return 0;
 
