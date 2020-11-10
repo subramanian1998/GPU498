@@ -132,7 +132,7 @@ unsigned char clamp(unsigned char x, unsigned char start, unsigned char end)
 __device__
 unsigned char correct_val(float* cdf, unsigned char val)
 {
-  return clamp((unsigned char)(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0])), 0, 255);
+  return clamp((unsigned char)(255 * ((cdf[val] - cdf[0]) / (1.0 - cdf[0]))), 0, 255);
 }
 
 __device__
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 256; i++)
   {
      wbLog(TRACE, "float" , hostInputImageData[i] , " ", hostOutputImageData[i]);
-    wbLog(TRACE, "hist " , hostHist[i]);
+     wbLog(TRACE, "hist " , hostHist[i]);
   }
   
 
