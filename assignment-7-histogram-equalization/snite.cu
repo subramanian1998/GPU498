@@ -141,7 +141,7 @@ float clamp(float x, float start, float end)
 __device__
 float correct_val(float* cdf, unsigned char val)
 {
-  return clamp(255 * (cdf[val] - cdf[0]) / (1.0f - cdf[0]), 0, 255.0f);
+  return clamp(255 * (float)(cdf[val] - cdf[0]) / (float)(1.0f - cdf[0]), 0, 255.0f);
 }
 
 __device__
@@ -201,7 +201,7 @@ void grayify(float* outputgray,
   cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-  //applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
+  applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
