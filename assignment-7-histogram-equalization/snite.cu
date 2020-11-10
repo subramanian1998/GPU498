@@ -133,15 +133,15 @@ float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 }
 
 __device__
-float clamp(float x, float start, float end)
+unsigned char clamp(unsigned char x, unsigned char start, unsigned char end)
 {
-  return fmin(fmax(x, start), end);
+  return min(max(x, start), end);
 }
 
 __device__
-float correct_val(float* cdf, unsigned char val)
+unsigned char correct_val(float* cdf, unsigned char val)
 {
-  return clamp(255 * (float)(cdf[val] - cdf[0]) / (float)(1.0f - cdf[0]), 0, 255.0f);
+  return clamp(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0]), 0, 255);
 }
 
 __device__
@@ -195,13 +195,13 @@ void grayify(float* outputgray,
   }
 
   //histify
-  //histify(hist, outputchar, imageWidth, imageHeight);
+  histify(hist, outputchar, imageWidth, imageHeight);
 
   //calc hist
-  //cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
+  cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-  //applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
+  applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
