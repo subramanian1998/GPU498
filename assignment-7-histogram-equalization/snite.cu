@@ -70,13 +70,22 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
   
   __shared__ float hist[256];
 
-  for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
-  {
-    //hist[inputchar[i * 3]] += 1;
-    atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
-    __syncthreads();
+  int min = 0;
 
+  for (int x = 0; i < gridDim.x, i++)
+  {
+    if (blockIdx.x == x)
+    {
+      for (int i = tidx; i < imageWidth * imageHeight; i += blockDim.x * gridDim.x)
+      {
+        //hist[inputchar[i * 3]] += 1;
+        atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
+        __syncthreads();
+      }
+    }
+    
   }
+  
 
   //have mini histograms done -> test -> sum upppp
   /*
@@ -86,7 +95,7 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
     __syncthreads();
   }
   */
-  if (blockIdx.x == 1)
+  if (blockIdx.x == 0)
   {
     for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
     {
