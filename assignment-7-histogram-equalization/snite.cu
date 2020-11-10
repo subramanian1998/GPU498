@@ -106,7 +106,7 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
 __device__
 float p(float x, int imageWidth, int imageHeight)
 {
-  return (float)( (x * 1.0f) / (imageWidth * imageHeight));
+  return (x / (imageWidth * imageHeight));
 }
 
 
@@ -142,7 +142,7 @@ void applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int image
 
   for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x * gridDim.x)
   {
-    outputchar[i] = correct_val(cdf, (unsigned int)outputchar[i]);
+    outputchar[i] = correct_val(cdf, (unsigned char)outputchar[i]);
   }
 }
 
