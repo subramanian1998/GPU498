@@ -109,16 +109,18 @@ float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 }
 
 __device__
+float clamp(float x, float start, float end)
+{
+  return min(max(x, start), end);
+}
+
+__device__
 float correct_val(float* cdf, unsigned char val)
 {
   return clamp(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0]), 0, 255.0);
 }
 
-__device__
-float clamp(float x, float start, float end)
-{
-  return min(max(x, start), end);
-}
+
 
 
 __global__ 
