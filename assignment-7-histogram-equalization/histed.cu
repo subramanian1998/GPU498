@@ -198,7 +198,7 @@ void grayify(float* outputgray,
   histify(hist, outputchar, imageWidth, imageHeight);
 
   //calc hist
-  cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
+  calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
   //applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
    //      (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
   cudaMemcpy(hostOutputImageData, cudaOutputImageData,
          (sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyDeviceToHost);
-  cudaMemcpy(hostHist, cudaCdf,
+  cudaMemcpy(hostHist, cudaHist,
          (sizeof(float) * 256), cudaMemcpyDeviceToHost);
   
   
