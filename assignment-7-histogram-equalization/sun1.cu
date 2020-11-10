@@ -135,6 +135,54 @@ void grayify(float* outputgray,
 
 }
 
+__global__ 
+void test(float* globHist, unsigned char* inputchar, int imageWidth, int imageHeight)
+{
+  //unsigned char** hgram = (unsigned char**)
+  //  (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
+
+  //int idx = threadIdx.x;
+  int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
+  
+  __shared__ float hist[256];
+
+
+  for (int x = 0; x < gridDim.x; x++)
+  {
+    if (blockIdx.x == x)
+    {
+      for (int i = tidx; i < imageWidth * imageHeight; i += blockDim.x * gridDim.x)
+      {
+        //hist[inputchar[i * 3]] += 1;
+        atomicAdd(hist + (inputchar[i * 3]), 1);
+        __syncthreads();
+      }
+    }
+    
+  }
+  
+
+  //have mini histograms done -> test -> sum upppp
+  /*
+  for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
+  {
+    atomicAdd(&globHist[i], hist[i]);
+    __syncthreads();
+  }
+  */
+  if (blockIdx.x == 0)
+  {
+    for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
+    {
+      atomicAdd(globHist + i, 1);
+      //atomicAdd(&globHist[i], hist[i]);
+      //globHist[i] = hist[i];
+      __syncthreads();
+    }
+  }
+
+}
+
 
 
 //Use total function from list-red
