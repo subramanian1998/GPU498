@@ -56,58 +56,8 @@ void cast(unsigned char* outputchar,
 
     }
   }
-}
-
-//Use total function from list-red
-__device__ 
-void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imageHeight)
-{
-  //unsigned char** hgram = (unsigned char**)
-  //  (malloc(imageWidth * imageHeight * sizeof(unsigned char*)));
-
-  //int idx = threadIdx.x;
-  int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
-  
-  __shared__ float hist[256];
-
-  for (int i = tidx; i < imageWidth * imageHeight;i += blockDim.x * gridDim.x)
-  {
-    //hist[inputchar[i * 3]] += 1;
-    atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
-    __syncthreads();
-
-  }
-
-  //have mini histograms done -> test -> sum upppp
-
-  for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
-  {
-    atomicAdd(&globHist[i], hist[i]);
-  }
-//...
 
 }
-
-__device__
-float p(unsigned char x, int imageWidth, int imageHeight)
-{
-  return (float)(x / (imageWidth * imageHeight));
-}
-
-
-//cdf is actually in floats but holds 256 representing characters(rgb vals)
-__device__
-float* calc_cdf(float* cdf, unsigned char* inputchar, int imageWidth, int imageHeight)
-{
-  cdf[0] = p(inputchar[0], imageWidth, imageHeight);
-  for (int i = 1; i < 256; i++)
-  {
-    cdf[i] = cdf[i - 1] + p(inputchar[i], imageWidth, imageHeight);
-  }
-
-  return cdf;
-}
-
 
 __global__ 
 void grayify(float* outputgray, 
@@ -120,41 +70,38 @@ void grayify(float* outputgray,
   int imageChannels)
 {
 
-  //cast
   cast(inputchar, inputrgb, imageWidth, imageHeight, imageChannels, 1);
   
   __syncthreads();
 
   int tidx = (blockIdx.x * blockDim.x) + threadIdx.x; 
   
-  //grayify
+
+  //ONLY 1/3 of image and 3x small images
+  //Casting not working
   for (int x = tidx; x < (imageWidth * imageHeight); x += blockDim.x)
   {
     int col = (x) % imageWidth;
     int row = (x) / imageWidth;
     int ii = (row * imageWidth) + col;
-
+    //float r = inputchar[imageChannels * ii] / 255.0 ;
+    //float g = inputchar[(imageChannels * ii) + 1]/ 255.0;
+    //float b = inputchar[(imageChannels * ii) + 2] / 255.0;
     unsigned char r = (unsigned char)(0.21 * inputchar[imageChannels * ii]);
     unsigned char g =  (unsigned char)(0.71 * inputchar[(imageChannels * ii) + 1]);
-    unsigned char b = (unsigned char)(0.07 * inputchar[(imageChannels * ii) + 2]);
-
+    unsigned char b = (unsigned char)(0.07 * inputchar[(imageChannels * ii) + 2]) ;
+    //unsigned char temp = (unsigned char)(255.0 *((unsigned char)(0.21*r) + (unsigned char)(0.71*g) + (unsigned char)(0.07*b)));
     __syncthreads();
     for (int i = 0 ; i <imageChannels;i++)
     {
+      //outputgray[(imageChannels * ii) + i] = (float) ((0.21*r) + (0.71*g) + (0.07*b));
       outputchar[(imageChannels * ii) + i] = (unsigned char)(r + g + b);
     }
   }
-
-  //histify
-  hist = histify(hist, outputchar, imageWidth, imageHeight);
-
-
-  //apply hist to image
-
-
-  //recast
+        
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
   
+
 }
 
 
@@ -204,15 +151,25 @@ int main(int argc, char **argv)
   float* cudaHist;
   float* hostHist;
   hostHist = (float *)malloc(256 * sizeof(float));
-
+  //unsigned char* testingChar;
+  //unsigned char* confirmedChar;
+  //testingChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
+  //confirmedChar = (unsigned char*)malloc(sizeof(unsigned char) * imageHeight * imageWidth * imageChannels);
   cudaMalloc(&cudaInputImageData, (int)(sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputImageData, (sizeof(float) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaHist, (sizeof(float) * 256));
   cudaMalloc(&cudaInputChar, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
   cudaMalloc(&cudaOutputChar, (sizeof(unsigned char) * imageChannels * imageHeight * imageWidth));
-
   cudaMemcpy(cudaInputImageData, hostInputImageData, 
   	(int)(sizeof(float) * imageChannels * imageHeight * imageWidth), cudaMemcpyHostToDevice);
+
+  /*
+  for (int i = 0; i < imageChannels * imageHeight * imageWidth; i++ )
+  {
+    confirmedChar[i] = (unsigned char)(255 * (hostInputImageData[i]));
+  }
+  */
+  //wbLog(TRACE, "output is ", testingChar[0], ' ', (unsigned char)(255 * hostInputImageData[0]) );
 
 
   //send data to kernel
@@ -235,6 +192,8 @@ int main(int argc, char **argv)
   wbLog(TRACE, "output is ");
   for (int i = 0; i < 20; i++)
   {
+	   //unsigned char temp = testingChar[i];
+     //wbLog(TRACE, "char" , confirmedChar[i], " ", temp);
      wbLog(TRACE, "float" , hostInputImageData[i] , " ", hostOutputImageData[i]);
   }
   
