@@ -195,13 +195,13 @@ void grayify(float* outputgray,
   }
 
   //histify
-  histify(hist, outputchar, imageWidth, imageHeight);
+  //histify(hist, outputchar, imageWidth, imageHeight);
 
   //calc hist
-  cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
+  //cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-  applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
+  //applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
