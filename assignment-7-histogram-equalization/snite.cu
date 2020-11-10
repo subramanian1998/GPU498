@@ -140,7 +140,7 @@ void applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int image
 {
   int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
 
-  for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x * gridDim.x)
+  for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x)
   {
     outputchar[i] = correct_val(cdf, (unsigned char)outputchar[i]);
   }
