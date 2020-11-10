@@ -123,10 +123,10 @@ float p(unsigned char x, int imageWidth, int imageHeight)
 __device__
 float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 {
-  cdf[0] = 1;//p(hist[0], imageWidth, imageHeight);
+  cdf[0] = p(hist[0], imageWidth, imageHeight);
   for (int i = 1; i < 256; i++)
   {
-    cdf[i] = cdf[i - 1] + 1;//p(hist[i], imageWidth, imageHeight);
+    cdf[i] = cdf[i - 1] + p(hist[i], imageWidth, imageHeight);
   }
 
   return cdf;
@@ -141,7 +141,7 @@ float clamp(float x, float start, float end)
 __device__
 float correct_val(float* cdf, unsigned char val)
 {
-  return clamp(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0]), 0, 255.0);
+  return clamp(255 * (cdf[val] - cdf[0]) / (1.0f - cdf[0]), 0, 255.0f);
 }
 
 __device__
