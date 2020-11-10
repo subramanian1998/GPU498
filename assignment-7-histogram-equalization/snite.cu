@@ -86,7 +86,7 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
     __syncthreads();
   }
   */
-  if (blockIdx.x == 0)
+  if (blockIdx.x == 1)
   {
     for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
     {
