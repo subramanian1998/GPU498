@@ -7,28 +7,6 @@
 
 //@@ insert code here
 
-__device__ inline void atomicAdd2(float* address, float value)
-
-{
-
-  float old = value;  
-
-  float new_old;
-
-do
-
-  {
-
-  new_old = atomicExch(address, 0.0f);
-
-  new_old += old;
-
-  }
-
-  while ((old = atomicExch(address, new_old))!=0.0f);
-
-};
-
 __device__
 void cast(unsigned char* outputchar, 
 	float* inputfloat, 
@@ -117,7 +95,7 @@ float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
   cdf[0] = p(hist[0], imageWidth, imageHeight);
   for (int i = 1; i < 256; i++)
   {
-    cdf[i] = cdf[i - 1] + p(hist[i], imageWidth, imageHeight);
+    cdf[i] = (float)(cdf[i - 1] + p(hist[i], imageWidth, imageHeight));
   }
 
   return cdf;
@@ -136,7 +114,7 @@ unsigned char correct_val(float* cdf, unsigned char val)
 }
 
 __device__
-void applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int imageHeight, int imageChannels)
+unsigned char * applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int imageHeight, int imageChannels)
 {
   int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
 
@@ -144,6 +122,8 @@ void applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int image
   {
     outputchar[i] = correct_val(cdf, (unsigned char)outputchar[i]);
   }
+
+  return outputchar;
 }
 
 
@@ -194,7 +174,7 @@ void grayify(float* outputgray,
 
   __syncthreads();
   //apply hist to image
-  applyhist(inputchar, cdf, imageWidth, imageHeight, imageChannels);
+  inputchar = applyhist(inputchar, cdf, imageWidth, imageHeight, imageChannels);
 
   //recast
   cast(inputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
