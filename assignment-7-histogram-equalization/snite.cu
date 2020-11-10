@@ -174,10 +174,10 @@ void grayify(float* outputgray,
   histify(hist, outputchar, imageWidth, imageHeight);
 
   //calc hist
-  calc_cdf(cdf, hist, imageWidth, imageHeight);
+  //calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-  applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
+  //applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels);
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
@@ -266,6 +266,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 20; i++)
   {
      wbLog(TRACE, "float" , hostInputImageData[i] , " ", hostOutputImageData[i]);
+    wbLog(TRACE, "hist " , hostHist[i]);
   }
   
 
