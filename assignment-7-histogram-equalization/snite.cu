@@ -191,6 +191,8 @@ void grayify(float* outputgray,
   //calc hist
   cdf = calc_cdf(cdf, hist, imageWidth, imageHeight);
 
+
+  __syncthreads();
   //apply hist to image
   applyhist(inputchar, cdf, imageWidth, imageHeight, imageChannels);
 
