@@ -83,8 +83,17 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
   for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
   {
     atomicAdd2(&globHist[i], hist[i]);
+    __syncthreads();
   }
-//...
+
+  if (blockIdx.x == 0)
+  {
+    for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
+    {
+      globHist[i] = hist[i];
+      __syncthreads();
+    }
+  }
 
 }
 
