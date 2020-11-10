@@ -80,11 +80,14 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
         //hist[inputchar[i * 3]] += 1;
         unsigned int offset = (unsigned int)((unsigned int)inputchar[i * 3]);
 	      float * addr = (float *)(hist + (unsigned int)offset);
-        atomicAdd((float *)(addr), (unsigned int)1);
+        atomicAdd((float *)(addr), (unsigned int)(1));
         //atomicAdd(&hist[(inputchar[i * 3])], hist[(inputchar[i * 3])] += 1);
         __syncthreads();
       }
+      __syncthreads();
     }
+
+   __syncthreads();
     
   }
   
@@ -97,9 +100,8 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
     __syncthreads();
   }
   */
-  if (blockIdx.x == 0)
-  {
-    for (int i = tidx; i < 256; i+= blockDim.x * gridDim.x)
+
+    for (int i = threadIdx.x; i < 256; i+= blockDim.x * gridDim.x)
     {
       //unsigned char offset = (unsigned char)inputchar[i * 3];
       atomicAdd((float *)(globHist + i),(unsigned int) hist[i]);
@@ -107,7 +109,6 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
       //globHist[i] = hist[i];
       __syncthreads();
     }
-  }
 
 }
 
@@ -286,7 +287,7 @@ int main(int argc, char **argv)
   
   
   wbLog(TRACE, "output is ");
-  for (int i = 0; i < 20; i++)
+  for (int i = 0; i < 256; i++)
   {
      wbLog(TRACE, "float" , hostInputImageData[i] , " ", hostOutputImageData[i]);
     wbLog(TRACE, "hist " , hostHist[i]);
