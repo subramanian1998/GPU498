@@ -70,9 +70,6 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
   
   __shared__ float hist[256];
 
-
-  for (int x = 0; x < gridDim.x; x++)
-  {
       for (int i = tidx; i < imageWidth * imageHeight; i += blockDim.x * gridDim.x)
       {
         //hist[inputchar[i * 3]] += 1;
@@ -83,9 +80,7 @@ void histify(float* globHist, unsigned char* inputchar, int imageWidth, int imag
         __syncthreads();
       }
 
-   __syncthreads();
-    
-  }
+
   
 
   //have mini histograms done -> test -> sum upppp
