@@ -120,6 +120,16 @@ float correct_val(float* cdf, unsigned char val)
   return clamp(255 * (cdf[val] - cdf[0]) / (1.0 - cdf[0]), 0, 255.0);
 }
 
+__device__
+void applyhist(unsigned char * outputchar, float* cdf, int imageWidth, int imageHeight, int imageChannels)
+{
+  int tidx = (blockDim.x * blockIdx.x) + threadIdx.x;
+
+  for (int i = tidx; i < imageWidth * imageHeight * imageChannels; i += blockDim.x * gridDim.x)
+  {
+    outputchar[i] = correct_val(cdf, outputchar[i]);
+  }
+}
 
 
 
@@ -167,7 +177,7 @@ void grayify(float* outputgray,
   calc_cdf(cdf, hist, imageWidth, imageHeight);
 
   //apply hist to image
-  
+  applyhist(outputchar, cdf, imageWidth, imageHeight, imageChannels)
 
   //recast
   cast(outputchar, outputgray, imageWidth, imageHeight, imageChannels, 2);
