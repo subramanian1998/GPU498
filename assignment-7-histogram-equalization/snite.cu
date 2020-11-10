@@ -135,7 +135,7 @@ float* calc_cdf(float* cdf, float* hist, int imageWidth, int imageHeight)
 __device__
 unsigned char clamp(unsigned char x, unsigned char start, unsigned char end)
 {
-  return min(max(x, start), end);
+  return fmin(fmax(x, start), end);
 }
 
 __device__
