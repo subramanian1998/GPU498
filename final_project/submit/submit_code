@@ -1,0 +1,3 @@
+mkdir -p /scratch/eecs498f20_class_root/eecs498f20_class/all_sub/$USER/final_project/
+chmod 770 $1
+cp -f $1 /scratch/eecs498f20_class_root/eecs498f20_class/all_sub/$USER/final_project/$USER.cuh
