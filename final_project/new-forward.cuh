@@ -50,9 +50,9 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
 #define index_y4d(i3, i2, i1, i0) (i3) * (M * H_out * W_out) + (i2) * (H_out * W_out) + (i1) * (W_out) + i0
 
     //int b = blockDim.x * blockIdx.x + threadIdx.x;
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    //int idx = blockDim.x * blockIdx.x + threadIdx.x;
     int tidx = threadIdx.x;
-    b = blockIdx.x;
+    int b = blockIdx.x;
     const int H_out = H - K + 1;
     const int W_out = W - K + 1;
 
@@ -61,7 +61,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
     {
         for (int m = 0; m < M; m++)         // for each output feature maps
             for (int h = 0; h < H_out; h++) // for each output element
-                for (int w = 0; w < W_out; w += blockDim.x)
+                for (int w = tidx; w < W_out; w += blockDim.x)
                 {
                     y4d(b, m, h, w) = 0; //maybe can remove?
 
@@ -111,7 +111,7 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
 
     //dim3 gridDim((B + 511) / 512); //When  B = 10000 ===> 20 
     dim3 gridDim(65536); //in each dim
-    float width = 32;
+    //float width = 32;
     //utiliz entire grid eventually (blockIdx.x + (base) gridDim => offset)
     dim3 blockDim(1024);
 
