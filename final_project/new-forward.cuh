@@ -8,7 +8,7 @@ namespace mxnet
 namespace op
 {
 
-__global__ void forward_kernel(float *y, const float *x, const float *k, const int B, const int M, const int C, const int H, const int W, const int K, __constant__ float weight)
+__global__ void forward_kernel(float *y, const float *x, const float *k, const int B, const int M, const int C, const int H, const int W, const int K)
 {
 
     /*
@@ -16,6 +16,8 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
     We have some nice #defs for you below to simplify indexing. Feel free to use them, or create your own.
     */
 
+
+__constant__ float weight[M*C*K*K]; 
 
 // An example use of these macros:
 // float a = y4d(0,0,0,0)
@@ -67,8 +69,8 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int W = x.shape_[3];
     const int K = w.shape_[3];
 
-    __constant__ float weight[M*C*K*K]; 
-    cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float))
+    float *weight;
+    cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
     dim3 gridDim((B + 511) / 512);
