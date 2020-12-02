@@ -37,7 +37,6 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
     const int H_out = H - K + 1;
     const int W_out = W - K + 1;
 
-    for (int b)
     if (b < B) // for each image in the batch
     {
         for (int m = 0; m < M; m++)         // for each output feature maps
