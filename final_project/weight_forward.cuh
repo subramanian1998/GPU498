@@ -30,14 +30,10 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
 #define k4d(i3, i2, i1, i0) weight[(i3) * (C * K * K) + (i2) * (K * K) + (i1) * (K) + i0]
 //#define k4d(i3, i2, i1, i0) k[(i3) * (C * K * K) + (i2) * (K * K) + (i1) * (K) + i0]
 
-
-#define index_y4d(i3, i2, i1, i0) (i3) * (M * H_out * W_out) + (i2) * (H_out * W_out) + (i1) * (W_out) + i0
-
     int b = blockDim.x * blockIdx.x + threadIdx.x;
     const int H_out = H - K + 1;
     const int W_out = W - K + 1;
 
-    for (int b)
     if (b < B) // for each image in the batch
     {
         for (int m = 0; m < M; m++)         // for each output feature maps
@@ -46,19 +42,11 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                 {
                     y4d(b, m, h, w) = 0;
 
-                    //__shared__ float fmap[512 * C * K * K];
-                    float temp = 0;
+                    //__shared__ float fmap[C * K * K];
                     for (int c = 0; c < C; c++)     // sum over all input feature maps
-                    {
                         for (int p = 0; p < K; p++) // KxK filter
-                        {
                             for (int q = 0; q < K; q++)
-                            {
-                                temp += x4d(b, c, h + p, w + q) * k4d(m, c, p, q);
-                            }
-                        }
-                    }
-                    y4d(b, m, h, w) = temp;
+                                y4d(b, m, h, w) += x4d(b, c, h + p, w + q) * k4d(m, c, p, q);
                 }
     }
 
