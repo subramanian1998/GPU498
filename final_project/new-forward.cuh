@@ -4,6 +4,22 @@
 #include <mxnet/base.h>
 #include <iostream>
 
+/*
+where to use shared_mem???
+for ckk or before?
+
+
+how to organize process --->  would it be bad to do some b of B in series 
+                              since all may not fit in space (each thread does less and faster for each b)
+
+So utilize moree grid and block and see how it changes with all B in parallel first
+
+
+
+unrolling??? might be easy or nah -> look into
+
+*/
+
 namespace mxnet
 {
 namespace op
@@ -33,17 +49,21 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
 
 #define index_y4d(i3, i2, i1, i0) (i3) * (M * H_out * W_out) + (i2) * (H_out * W_out) + (i1) * (W_out) + i0
 
-    int b = blockDim.x * blockIdx.x + threadIdx.x;
+    //int b = blockDim.x * blockIdx.x + threadIdx.x;
+    int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    int tidx = threadIdx.x;
+    b = blockIdx.x;
     const int H_out = H - K + 1;
     const int W_out = W - K + 1;
+
 
     if (b < B) // for each image in the batch
     {
         for (int m = 0; m < M; m++)         // for each output feature maps
             for (int h = 0; h < H_out; h++) // for each output element
-                for (int w = 0; w < W_out; w++)
+                for (int w = 0; w < W_out; w += blockDim.x)
                 {
-                    y4d(b, m, h, w) = 0;
+                    y4d(b, m, h, w) = 0; //maybe can remove?
 
                     //__shared__ float fmap[512 * C * K * K];
                     float temp = 0;
@@ -90,9 +110,10 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
 
 
     //dim3 gridDim((B + 511) / 512); //When  B = 10000 ===> 20 
-    dim3 gridDim(512);
+    dim3 gridDim(65536); //in each dim
+    float width = 32;
     //utiliz entire grid eventually (blockIdx.x + (base) gridDim => offset)
-    dim3 blockDim(512);
+    dim3 blockDim(1024);
 
     MSHADOW_CUDA_CALL(cudaDeviceSynchronize());
     forward_kernel<<<gridDim, blockDim>>>(y.dptr_, x.dptr_, w.dptr_, B, M, C, H, W, K);
