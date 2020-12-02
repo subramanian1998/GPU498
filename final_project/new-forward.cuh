@@ -8,7 +8,7 @@ namespace mxnet
 namespace op
 {
 
-	__device__ __constant__ float weight[24*12*7*7]; 
+__device__ __constant__ float weight[24*12*7*7]; 
 
 __global__ void forward_kernel(float *y, const float *x, const float *k, const int B, const int M, const int C, const int H, const int W, const int K)
 {
@@ -71,7 +71,6 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int W = x.shape_[3];
     const int K = w.shape_[3];
 
-    float *weight;
     cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
