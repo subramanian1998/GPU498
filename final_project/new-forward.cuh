@@ -22,7 +22,8 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
 // y4d(0,0,0,0) = a
 #define y4d(i3, i2, i1, i0) y[(i3) * (M * H_out * W_out) + (i2) * (H_out * W_out) + (i1) * (W_out) + i0]
 #define x4d(i3, i2, i1, i0) x[(i3) * (C * H * W) + (i2) * (H * W) + (i1) * (W) + i0]
-#define k4d(i3, i2, i1, i0) k[(i3) * (C * K * K) + (i2) * (K * K) + (i1) * (K) + i0]
+#define k4d(i3, i2, i1, i0) weight[(i3) * (C * K * K) + (i2) * (K * K) + (i1) * (K) + i0]
+//#define k4d(i3, i2, i1, i0) k[(i3) * (C * K * K) + (i2) * (K * K) + (i1) * (K) + i0]
 
     int b = blockDim.x * blockIdx.x + threadIdx.x;
     const int H_out = H - K + 1;
@@ -65,6 +66,10 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int H = x.shape_[2];
     const int W = x.shape_[3];
     const int K = w.shape_[3];
+
+    __constant__ float weight[M*C*K*K]; 
+    cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float))
+
 
     dim3 gridDim((B + 511) / 512);
     dim3 blockDim(512);
