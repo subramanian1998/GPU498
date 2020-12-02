@@ -8,6 +8,8 @@ namespace mxnet
 namespace op
 {
 
+	__device__ __constant__ float weight[24*12*7*7]; 
+
 __global__ void forward_kernel(float *y, const float *x, const float *k, const int B, const int M, const int C, const int H, const int W, const int K)
 {
 
@@ -17,7 +19,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
     */
 
 
-__constant__ float weight[M*C*K*K]; 
+
 
 // An example use of these macros:
 // float a = y4d(0,0,0,0)
