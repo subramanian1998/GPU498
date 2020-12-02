@@ -2,6 +2,7 @@
 #define MXNET_OPERATOR_NEW_FORWARD_CUH_
 
 #include <mxnet/base.h>
+#include <iostream>
 
 namespace mxnet
 {
@@ -70,7 +71,8 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int H = x.shape_[2];
     const int W = x.shape_[3];
     const int K = w.shape_[3];
-
+    
+    printf("NUMBER OF IMAGES %i", B);
     cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
