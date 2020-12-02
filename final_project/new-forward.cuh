@@ -9,7 +9,7 @@ namespace mxnet
 namespace op
 {
 
-__device__ __constant__ float weight[24*12*7*7]; 
+__device__ __constant__ float weight[24*12*7*7]; //14112
 
 __global__ void forward_kernel(float *y, const float *x, const float *k, const int B, const int M, const int C, const int H, const int W, const int K)
 {
@@ -41,6 +41,8 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                 for (int w = 0; w < W_out; w++)
                 {
                     y4d(b, m, h, w) = 0;
+
+                    //__shared__ float fmap[C * K * K];
                     for (int c = 0; c < C; c++)     // sum over all input feature maps
                         for (int p = 0; p < K; p++) // KxK filter
                             for (int q = 0; q < K; q++)
@@ -72,11 +74,13 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int W = x.shape_[3];
     const int K = w.shape_[3];
     
-    printf("NUMBER OF IMAGES %i", B);
+    printf("NUMBER OF IMAGES %i", B); //10,000
     cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
-    dim3 gridDim((B + 511) / 512);
+    //dim3 gridDim((B + 511) / 512); //When  B = 10000 ===> 20 
+    dim3 gridDim(512);
+    //utiliz entire grid eventually (blockIdx.x + (base) gridDim => offset)
     dim3 blockDim(512);
 
     MSHADOW_CUDA_CALL(cudaDeviceSynchronize());
