@@ -48,6 +48,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
 
 
 #define index_y4d(i3, i2, i1, i0) (i3) * (M * H_out * W_out) + (i2) * (H_out * W_out) + (i1) * (W_out) + i0
+#define index_x4d(i3, i2, i1, i0) (i3) * (C * H * W) + (i2) * (H * W) + (i1) * (W) + i0
 
     //int b = blockDim.x * blockIdx.x + threadIdx.x;
     //int idx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -65,7 +66,18 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                 {
                     y4d(b, m, h, w) = 0; //maybe can remove?
 
-                    //__shared__ float fmap[512 * C * K * K];
+                    __shared__ float fmap[blockDim.x * C * K * K]; //blockDim is 1024
+                     for (int c = 0; c < C; c++)     // sum over all input feature maps
+                    {
+                        for (int p = 0; p < K; p++) // KxK filter
+                        {
+                            for (int q = 0; q < K; q++)
+                            {
+                                fmap[(tidx * C * K * K) +  index_x4d(b, c, h + p, w + q)] = index_x4d(b, c, h + p, w + q);
+                            }
+                        }
+                    }
+
                     float temp = 0;
                     for (int c = 0; c < C; c++)     // sum over all input feature maps
                     {
@@ -73,7 +85,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                         {
                             for (int q = 0; q < K; q++)
                             {
-                                temp += x4d(b, c, h + p, w + q) * k4d(m, c, p, q);
+                                temp += fmap(b, c, h + p, w + q) * k4d(m, c, p, q);
                             }
                         }
                     }
