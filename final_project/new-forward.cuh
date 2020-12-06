@@ -66,7 +66,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                 {
                     y4d(b, m, h, w) = 0; //maybe can remove?
 
-                    __shared__ float fmap[1024 * C * K * K]; //blockDim is 1024
+                    __shared__ float fmap[1024 * 12 * 7 * 7]; //blockDim is 1024
                      for (int c = 0; c < C; c++)     // sum over all input feature maps
                     {
                         for (int p = 0; p < K; p++) // KxK filter
