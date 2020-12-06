@@ -73,7 +73,7 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                         {
                             for (int q = 0; q < K; q++)
                             {
-                                fmap[(tidx * C * K * K) +  index_x4d(c, h + p, w + q)] = index_x4d(b, c, h + p, w + q);
+                                fmap[(tidx * C * K * K) +  index_x4d(c, h + p, w + q)] = index_x4d(c, h + p, w + q);
                             }
                         }
                     }
