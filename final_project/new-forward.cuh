@@ -66,6 +66,9 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                 {
                     y4d(b, m, h, w) = 0; //maybe can remove?
 
+
+
+                    /*
                     __shared__ float fmap[1024 * 12 * 7 * 7]; //blockDim is 1024
                      for (int c = 0; c < C; c++)     // sum over all input feature maps
                     {
@@ -77,6 +80,8 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                             }
                         }
                     }
+					*/
+
 
                     float temp = 0;
                     for (int c = 0; c < C; c++)     // sum over all input feature maps
@@ -85,7 +90,8 @@ __global__ void forward_kernel(float *y, const float *x, const float *k, const i
                         {
                             for (int q = 0; q < K; q++)
                             {
-                                temp += fmap[(tidx * C * K * K) +  index_x4d(c, h + p, w + q)]  * k4d(m, c, p, q);
+                                //temp += fmap[(tidx * C * K * K) +  index_x4d(c, h + p, w + q)]  * k4d(m, c, p, q);
+                                temp += x4d(c, h + p, w + q)  * k4d(m, c, p, q);
                             }
                         }
                     }
@@ -118,7 +124,6 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int K = w.shape_[3];
     
     //printf("NUMBER OF IMAGES %i", B); //10,000
-    printf("TRIAL COMPLETE");
     cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
