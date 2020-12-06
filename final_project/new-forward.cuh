@@ -118,6 +118,7 @@ void forward<gpu, float>(mshadow::Tensor<gpu, 4, float> &y, const mshadow::Tenso
     const int K = w.shape_[3];
     
     //printf("NUMBER OF IMAGES %i", B); //10,000
+    printf("TRIAL COMPLETE");
     cudaMemcpyToSymbol(weight, w.dptr_, M*C*K*K*sizeof(float));
 
 
